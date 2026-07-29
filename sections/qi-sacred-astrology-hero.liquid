@@ -65,13 +65,72 @@
       <p class="qi-sacred__micro">Personal Reflection&nbsp;&nbsp;•&nbsp;&nbsp;Crystal Recommendation</p>
     </div>
 
-    <div class="qi-sacred__oracle" aria-label="Sacred astrology guide">
+    <div class="qi-sacred__oracle" aria-label="Sacred energy vessel visualization">
       <div class="qi-sacred__beam" aria-hidden="true"></div>
-      {% if section.settings.priestess != blank %}
-        {{ section.settings.priestess | image_url: width: 1600 | image_tag: class: 'qi-sacred__priestess qi-sacred__priestess--custom', loading: 'eager', fetchpriority: 'high', widths: '480,720,960,1200,1600', sizes: '(max-width: 899px) 100vw, 44vw', alt: 'Sacred astrology guide' }}
-      {% else %}
-        <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-priestess-scene-v5.webp' | asset_url }}" alt="Sacred astrology guide surrounded by a celestial wheel and crystals" width="900" height="2092" loading="eager" fetchpriority="high">
-      {% endif %}
+      <div class="qi-sacred__zodiac" aria-hidden="true">
+        <span class="qi-sacred__zodiac-ring qi-sacred__zodiac-ring--outer"></span>
+        <span class="qi-sacred__zodiac-ring qi-sacred__zodiac-ring--inner"></span>
+        <span class="qi-sacred__zodiac-stars">✦ · ☉ · ☾ · ♀ · ♂ · ♃ · ♄ · ♅ · ♆ · ✦</span>
+      </div>
+
+      <div class="qi-sacred__oracle-art" aria-hidden="true">
+        <svg class="qi-sacred__vessel" viewBox="0 0 620 900" role="presentation" focusable="false">
+          <defs>
+            <linearGradient id="qiVesselGold-{{ section.id }}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff4d8" stop-opacity=".96"/>
+              <stop offset=".38" stop-color="#e7b86d" stop-opacity=".76"/>
+              <stop offset="1" stop-color="#8a5a2c" stop-opacity=".08"/>
+            </linearGradient>
+            <radialGradient id="qiVesselAura-{{ section.id }}" cx="50%" cy="38%" r="58%">
+              <stop offset="0" stop-color="#fff7df" stop-opacity=".62"/>
+              <stop offset=".35" stop-color="#d9a250" stop-opacity=".2"/>
+              <stop offset="1" stop-color="#d9a250" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="qiVesselGlow-{{ section.id }}" x="-70%" y="-70%" width="240%" height="240%">
+              <feGaussianBlur stdDeviation="7" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <ellipse cx="310" cy="390" rx="245" ry="330" fill="url(#qiVesselAura-{{ section.id }})"/>
+          <g class="qi-sacred__vessel-lines" fill="none" stroke="url(#qiVesselGold-{{ section.id }})" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M310 116c-58 0-108 47-108 112 0 61 35 109 58 132 10 11 16 25 16 40v20h68v-20c0-15 6-29 16-40 23-23 58-71 58-132 0-65-50-112-108-112Z"/>
+            <path d="M239 195c20-39 49-59 71-59s51 20 71 59"/>
+            <path d="M244 219c13 77 33 117 66 136 33-19 53-59 66-136"/>
+            <path d="M276 420c-31 28-71 58-103 104-31 45-47 103-52 174M344 420c31 28 71 58 103 104 31 45 47 103 52 174"/>
+            <path d="M276 421c-2 102-20 188-64 273M344 421c2 102 20 188 64 273"/>
+            <path d="M212 694c42 37 76 57 98 61 22-4 56-24 98-61"/>
+            <path d="M309 420v336"/>
+            <path d="M258 481c18 20 35 31 52 35 17-4 34-15 52-35"/>
+            <path d="M241 541c26 27 49 42 69 46 20-4 43-19 69-46"/>
+            <path d="M224 607c34 31 63 47 86 51 23-4 52-20 86-51"/>
+            <path d="M173 524c-31 82-46 161-44 237M447 524c31 82 46 161 44 237"/>
+            <path d="M129 761c54 25 114 38 181 38s127-13 181-38"/>
+          </g>
+
+          <g class="qi-sacred__vessel-nodes" fill="#f3c77d" filter="url(#qiVesselGlow-{{ section.id }})">
+            <circle cx="310" cy="178" r="5"/><circle cx="310" cy="310" r="6"/>
+            <circle cx="310" cy="420" r="5"/><circle cx="310" cy="516" r="5"/>
+            <circle cx="310" cy="587" r="6"/><circle cx="310" cy="658" r="7"/>
+            <circle cx="310" cy="756" r="8"/>
+          </g>
+
+          <g class="qi-sacred__crystal" transform="translate(310 800)">
+            <path d="M0-96 42-34 27 42 0 79-27 42-42-34Z" fill="rgba(236,190,119,.13)" stroke="#e6b56b" stroke-width="2"/>
+            <path d="M0-96V79M-42-34h84M-27 42h54" fill="none" stroke="#f3d49b" stroke-opacity=".72"/>
+            <path d="M0-96 18-34 0 79-18-34Z" fill="rgba(255,247,220,.16)"/>
+          </g>
+        </svg>
+
+        <span class="qi-sacred__energy-orbit qi-sacred__energy-orbit--one"></span>
+        <span class="qi-sacred__energy-orbit qi-sacred__energy-orbit--two"></span>
+        <span class="qi-sacred__energy-core">✦</span>
+      </div>
+
+      <div class="qi-sacred__altar" aria-hidden="true">
+        <span class="qi-sacred__altar-ring"></span>
+        <span class="qi-sacred__altar-glow"></span>
+      </div>
       <span class="qi-sacred__oracle-vignette" aria-hidden="true"></span>
     </div>
 
@@ -125,7 +184,6 @@
   "tag": "section",
   "class": "section-qi-sacred-hero",
   "settings": [
-    {"type":"image_picker","id":"priestess","label":"Priestess image"},
     {"type":"link_list","id":"menu","label":"Navigation menu"},
     {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","info":"Optional. Leave blank until your secure server endpoint is ready."},
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
