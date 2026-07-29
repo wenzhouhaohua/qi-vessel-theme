@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "birth-chart": {
+      "type": "birth-chart",
+      "settings": {}
+    }
+  },
+  "order": ["birth-chart"]
+}

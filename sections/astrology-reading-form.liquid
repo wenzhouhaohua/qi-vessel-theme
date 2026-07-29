@@ -1,0 +1,403 @@
+<style>
+  .qi-hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #1a0a2e;
+    font-family: 'Open Sans', sans-serif;
+  }
+  .qi-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('{{ section.settings.bg_image | image_url: width: 1920 }}');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+  .qi-hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(26,10,46,0.45) 0%, rgba(43,20,71,0.6) 100%);
+  }
+  .qi-zodiac-left,
+  .qi-zodiac-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    z-index: 2;
+    font-size: 1.5rem;
+    color: #F7E7C4;
+    opacity: 0.75;
+    text-shadow: 0 0 12px rgba(247,231,196,0.6);
+  }
+  .qi-zodiac-left { left: 20px; }
+  .qi-zodiac-right { right: 20px; }
+  @media (max-width: 768px) {
+    .qi-zodiac-left, .qi-zodiac-right { display: none; }
+  }
+  .qi-form-wrapper {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .qi-form-card {
+    background: rgba(26, 10, 46, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(247,231,196,0.25);
+    border-radius: 20px;
+    padding: 44px 40px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+  }
+  .qi-reading-title {
+    color: #F7E7C4;
+    font-family: 'Raleway', sans-serif;
+    font-size: 2rem;
+    text-align: center;
+    margin: 0 0 8px;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    text-shadow: 0 0 20px rgba(247,231,196,0.4);
+  }
+  .qi-reading-subtitle {
+    color: #E2D6F7;
+    text-align: center;
+    font-size: 0.85rem;
+    margin-bottom: 32px;
+    opacity: 0.8;
+    line-height: 1.6;
+  }
+  .qi-form-group { margin-bottom: 16px; }
+  .qi-form-group label {
+    display: block;
+    color: #F7E7C4;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.9;
+  }
+  .qi-form-group input,
+  .qi-form-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(247,231,196,0.25);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #F7E7C4;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .qi-form-group select option { background: #2B1447; color: #F7E7C4; }
+  .qi-form-group input:focus,
+  .qi-form-group select:focus {
+    outline: none;
+    border-color: rgba(247,231,196,0.7);
+    background: rgba(255,255,255,0.12);
+  }
+  .qi-form-group input::placeholder { color: rgba(247,231,196,0.3); }
+  .qi-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #7B4FBF, #3D1A6E);
+    border: 1px solid rgba(247,231,196,0.5);
+    color: #F7E7C4;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(123,79,191,0.4);
+  }
+  .qi-submit-btn:hover {
+    background: linear-gradient(135deg, #9060D0, #4D2A80);
+    box-shadow: 0 6px 28px rgba(123,79,191,0.6);
+    transform: translateY(-1px);
+  }
+  .qi-privacy {
+    color: rgba(226,214,247,0.45);
+    font-size: 0.72rem;
+    text-align: center;
+    margin-top: 12px;
+  }
+  .qi-error {
+    display: none;
+    background: rgba(255,80,80,0.1);
+    border: 1px solid rgba(255,80,80,0.3);
+    border-radius: 8px;
+    color: #ffaaaa;
+    padding: 12px;
+    margin-top: 12px;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .qi-loading {
+    display: none;
+    text-align: center;
+    color: #E2D6F7;
+    padding: 40px 0;
+  }
+  .qi-loading-spinner {
+    width: 44px; height: 44px;
+    border: 3px solid rgba(247,231,196,0.15);
+    border-top-color: #F7E7C4;
+    border-radius: 50%;
+    animation: qi-spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes qi-spin { to { transform: rotate(360deg); } }
+  .qi-result {
+    display: none;
+    color: #F7E7C4;
+    line-height: 1.85;
+  }
+  .qi-result h3 {
+    color: #F7E7C4;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.05rem;
+    margin: 22px 0 8px;
+    border-bottom: 1px solid rgba(247,231,196,0.15);
+    padding-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .qi-result h3:first-child { margin-top: 0; }
+  .qi-result p { color: #E2D6F7; margin: 0 0 10px; font-size: 0.9rem; }
+  .qi-products {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(247,231,196,0.15);
+  }
+  .qi-products h3 { font-size: 0.95rem; margin-bottom: 12px; }
+  .qi-product-links a {
+    display: inline-block;
+    background: rgba(93,56,145,0.35);
+    border: 1px solid rgba(247,231,196,0.25);
+    color: #F7E7C4;
+    padding: 7px 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    margin: 3px;
+    transition: background 0.2s;
+  }
+  .qi-product-links a:hover { background: rgba(93,56,145,0.65); }
+  .qi-reset-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: transparent;
+    border: 1px solid rgba(247,231,196,0.35);
+    color: #E2D6F7;
+    padding: 9px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    transition: border-color 0.2s;
+  }
+  .qi-reset-btn:hover { border-color: rgba(247,231,196,0.7); }
+</style>
+
+<div class="qi-hero-section">
+  <div class="qi-hero-bg"></div>
+
+  <div class="qi-zodiac-left">
+    <span>♈</span><span>♉</span><span>♊</span>
+    <span>♋</span><span>♌</span><span>♍</span>
+  </div>
+  <div class="qi-zodiac-right">
+    <span>☉</span><span>☽</span><span>♂</span>
+    <span>♀</span><span>♃</span><span>♄</span>
+  </div>
+
+  <div class="qi-form-wrapper">
+    <div class="qi-form-card">
+      <h1 class="qi-reading-title">✦ The Stars Know Your Name ✦</h1>
+      <p class="qi-reading-subtitle">Enter your birth details and unveil the reading the stars have been waiting for you to hear</p>
+
+      <form id="qi-astro-form">
+        <div class="qi-form-group">
+          <label>Full Name</label>
+          <input type="text" id="qi-name" placeholder="Your full name" required>
+        </div>
+        <div class="qi-form-group">
+          <label>Date of Birth</label>
+          <input type="date" id="qi-date" required>
+        </div>
+        <div class="qi-form-group">
+          <label>Exact Time of Birth</label>
+          <input type="time" id="qi-time" required>
+        </div>
+        <div class="qi-form-group">
+          <label>Place of Birth</label>
+          <input type="text" id="qi-location" placeholder="City, Country" required>
+        </div>
+        <div class="qi-form-group">
+          <label>Gender</label>
+          <select id="qi-gender" required>
+            <option value="" disabled selected>Select your gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="non-binary">Non-binary</option>
+            <option value="prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="qi-form-group">
+          <label>Email — Receive Your Full Reading</label>
+          <input type="email" id="qi-email" placeholder="your@email.com" required>
+        </div>
+        <button type="submit" class="qi-submit-btn">✦ Reveal My Chart ✦</button>
+        <p class="qi-privacy">🔒 Your details are private and never shared.</p>
+        <div class="qi-error" id="qi-error"></div>
+      </form>
+
+      <div class="qi-loading" id="qi-loading">
+        <div class="qi-loading-spinner"></div>
+        <p>The stars are aligning for you…</p>
+      </div>
+
+      <div class="qi-result" id="qi-result">
+        <div id="qi-result-content"></div>
+        <div class="qi-products">
+          <h3>✦ Crystals & Vessels Chosen for Your Chart</h3>
+          <div class="qi-product-links">
+            <a href="/products/asset-pack-81882480642-example-product-1">Ebony Wood Feng Shui Bracelet</a>
+            <a href="/products/asset-pack-81882480642-example-product-2">Jade Crystal Mala Beads</a>
+            <a href="/products/asset-pack-81882480642-example-product-3">Antique Gold Spiritual Talisman</a>
+            <a href="/products/asset-pack-81892868098-example-product-1">Obsidian Feng Shui Bracelet</a>
+            <a href="/products/asset-pack-81892868098-example-product-2">Zodiac Amethyst Crystal Talisman</a>
+          </div>
+        </div>
+        <button class="qi-reset-btn" id="qi-reset">✦ Begin a New Reading</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const DEEPSEEK_API_KEY = 'sk-1565875642dsc45315ssds';
+  const form = document.getElementById('qi-astro-form');
+  const loading = document.getElementById('qi-loading');
+  const result = document.getElementById('qi-result');
+  const resultContent = document.getElementById('qi-result-content');
+  const errorBox = document.getElementById('qi-error');
+  const resetBtn = document.getElementById('qi-reset');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('qi-name').value.trim();
+    const date = document.getElementById('qi-date').value;
+    const time = document.getElementById('qi-time').value;
+    const location = document.getElementById('qi-location').value.trim();
+    const gender = document.getElementById('qi-gender').value;
+    const email = document.getElementById('qi-email').value.trim();
+
+    form.style.display = 'none';
+    loading.style.display = 'block';
+    errorBox.style.display = 'none';
+
+    try {
+      await fetch('/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          form_type: 'customer', utf8: '✓',
+          'contact[email]': email,
+          'contact[first_name]': name.split(' ')[0],
+          'contact[last_name]': name.split(' ').slice(1).join(' ')
+        })
+      });
+    } catch(e) {}
+
+    const prompt = `You are a professional Western astrologer. Based on the birth details below, provide a rich personalized natal chart reading entirely in English. Use only Western astrology — no Chinese astrology or Five Elements.
+
+Name: ${name} | Gender: ${gender} | DOB: ${date} | Time: ${time} | Place: ${location}
+
+Use these exact section headers:
+
+[The Big Three]
+Sun, Moon, and Rising signs — what they reveal about ${name}'s identity, emotions, and outer persona.
+
+[Dominant Planets & Chart Ruler]
+Chart ruler based on Rising sign. Most prominent planets and their influence.
+
+[Love & Relationships]
+7th house, Venus sign. Romantic style, love language, ideal partner.
+
+[Career & Life Purpose]
+10th house, Midheaven. Vocational gifts and life direction.
+
+[Current Cosmic Weather — 2026]
+One or two major transits affecting ${name} this year and what they mean.
+
+[Crystal & Talisman Guidance]
+2-3 crystals based on chart elements and ruling planet. Be specific.
+
+Tone: warm, poetic, mystical. Address ${name} directly. Be specific, not generic.`;
+
+    try {
+      const res = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${DEEPSEEK_API_KEY}` },
+        body: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], max_tokens: 2500, temperature: 0.85 })
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const text = data.choices[0].message.content;
+      const html = text
+        .replace(/\[(.+?)\]/g, '<h3>$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+      resultContent.innerHTML = `<p>${html}</p>`;
+      loading.style.display = 'none';
+      result.style.display = 'block';
+      result.scrollIntoView({ behavior: 'smooth' });
+    } catch(e) {
+      loading.style.display = 'none';
+      form.style.display = 'block';
+      errorBox.textContent = 'Something went wrong. Please try again.';
+      errorBox.style.display = 'block';
+    }
+  });
+
+  resetBtn.addEventListener('click', function() {
+    result.style.display = 'none';
+    form.style.display = 'block';
+    form.reset();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Birth Chart Reading",
+  "tag": "section",
+  "class": "qi-astrology-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    }
+  ],
+  "presets": [{"name": "Birth Chart Reading"}]
+}
+{% endschema %}
