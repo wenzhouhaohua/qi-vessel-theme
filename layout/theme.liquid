@@ -44,9 +44,11 @@
     {% render 'chat-drawer' %}
 
     <div class="page-wrapper">
-      <div id="header-group">
-        {% sections 'header-group' %}
-      </div>
+      {% unless template.name == 'index' %}
+        <div id="header-group">
+          {% sections 'header-group' %}
+        </div>
+      {% endunless %}
 
       <script>
         // Inline header height and menu style calculations to prevent layout shift
@@ -127,9 +129,11 @@
         {{ content_for_layout }}
       </main>
 
-      <footer>
-        {% sections 'footer-group' %}
-      </footer>
+      {% unless template.name == 'index' %}
+        <footer>
+          {% sections 'footer-group' %}
+        </footer>
+      {% endunless %}
     </div>
 
     {% render 'cart-drawer', render_wrapper: true %}

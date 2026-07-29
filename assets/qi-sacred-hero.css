@@ -1,3 +1,7 @@
+/* QI Vessel home owns the full viewport. Neutralize legacy theme wrappers. */
+body.qi-home{margin:0;background:#05060a;overflow-x:hidden}
+body.qi-home .page-wrapper,body.qi-home #MainContent,body.qi-home .content-for-layout,body.qi-home .shopify-section{width:100%;max-width:none;margin:0;padding:0}
+body.qi-home #MainContent{display:block;overflow:visible}
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap');
 
 .qi-home #header-group{display:none}.qi-home .content-for-layout{padding:0}.section-qi-sacred-hero{margin:0!important}
