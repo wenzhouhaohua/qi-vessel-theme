@@ -1,68 +1,141 @@
 {{ 'qi-sacred-hero.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'qi-sacred-hero.js' | asset_url }}" defer></script>
 
-<section id="QiVisualLock-{{ section.id }}" class="qi-lock" data-qi-visual-lock data-api-endpoint="{{ section.settings.api_endpoint | escape }}">
-  <picture class="qi-lock__art" aria-hidden="true">
-    <source media="(max-width: 749px)" srcset="{{ 'qi-vessel-final-mobile-lock.webp' | asset_url }}">
-    <img
-      src="{{ 'qi-vessel-final-visual-lock.png' | asset_url }}"
-      width="1197"
-      height="1314"
-      alt=""
-      loading="eager"
-      fetchpriority="high"
-    >
-  </picture>
-
-  <div class="qi-lock__interactive">
-    <a class="qi-lock__hotspot qi-lock__hotspot--home" href="{{ routes.root_url }}" aria-label="Home"></a>
-    <a class="qi-lock__hotspot qi-lock__hotspot--about" href="{{ routes.root_url }}pages/about" aria-label="About"></a>
-    <a class="qi-lock__hotspot qi-lock__hotspot--how" href="#QiJourney-{{ section.id }}" aria-label="How it works"></a>
-    <a class="qi-lock__hotspot qi-lock__hotspot--crystals" href="{{ routes.collections_url }}" aria-label="Crystals"></a>
-    <a class="qi-lock__hotspot qi-lock__hotspot--journal" href="{{ routes.blogs_url }}" aria-label="Journal"></a>
-    <a class="qi-lock__hotspot qi-lock__hotspot--signin" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" aria-label="Sign in"></a>
-
-    <button class="qi-lock__hotspot qi-lock__hotspot--begin" type="button" data-open-reading aria-label="Begin your reading"></button>
-
-    <form class="qi-lock__form" data-astral-form novalidate>
-      <label class="visually-hidden" for="QiName-{{ section.id }}">Name</label>
-      <input id="QiName-{{ section.id }}" class="qi-lock__control qi-lock__control--name" name="name" autocomplete="name" required>
-
-      <label class="visually-hidden" for="QiDate-{{ section.id }}">Birth date</label>
-      <input id="QiDate-{{ section.id }}" class="qi-lock__control qi-lock__control--date" name="birth_date" type="date" required>
-
-      <label class="visually-hidden" for="QiPlace-{{ section.id }}">Birth place</label>
-      <input id="QiPlace-{{ section.id }}" class="qi-lock__control qi-lock__control--place" name="birth_place" autocomplete="address-level2" required>
-
-      <fieldset class="qi-lock__intentions">
-        <legend class="visually-hidden">What are you seeking clarity on?</legend>
-        <label><input type="radio" name="intention" value="Emotional Balance" required><span class="visually-hidden">Emotional Balance</span></label>
-        <label><input type="radio" name="intention" value="Purpose & Growth"><span class="visually-hidden">Purpose and Growth</span></label>
-        <label><input type="radio" name="intention" value="Love & Connection"><span class="visually-hidden">Love and Connection</span></label>
-      </fieldset>
-
-      <button class="qi-lock__submit" type="submit" aria-label="Reveal my energy map"></button>
-      <p class="visually-hidden" role="status" aria-live="polite" data-form-status></p>
-    </form>
+<section
+  id="QiSacredHero-{{ section.id }}"
+  class="qi-sacred"
+  data-qi-sacred
+  data-api-endpoint="{{ section.settings.api_endpoint | escape }}"
+>
+  <div class="qi-sacred__cosmos" aria-hidden="true">
+    <span class="qi-sacred__nebula qi-sacred__nebula--one"></span>
+    <span class="qi-sacred__nebula qi-sacred__nebula--two"></span>
+    <span class="qi-sacred__stars qi-sacred__stars--far"></span>
+    <span class="qi-sacred__stars qi-sacred__stars--near"></span>
+    <span class="qi-sacred__light-column"></span>
   </div>
 
-  <span id="QiJourney-{{ section.id }}" class="qi-lock__journey-anchor" aria-hidden="true"></span>
+  <header class="qi-sacred__nav">
+    <a class="qi-sacred__brand" href="{{ routes.root_url }}" aria-label="QI Vessel home">
+      <span class="qi-sacred__brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" role="presentation">
+          <circle cx="32" cy="32" r="27"></circle><circle cx="32" cy="32" r="20"></circle>
+          <path d="M32 7v50M7 32h50M14.3 14.3l35.4 35.4M49.7 14.3 14.3 49.7"></path>
+          <path class="fill" d="m32 18 3.7 10.3L46 32l-10.3 3.7L32 46l-3.7-10.3L18 32l10.3-3.7L32 18Z"></path>
+        </svg>
+      </span>
+      <span class="qi-sacred__brand-copy"><strong>QI VESSEL</strong><small>SACRED ASTROLOGY</small></span>
+    </a>
 
-  <dialog class="qi-lock__ritual" data-ritual-dialog>
-    <button class="qi-lock__ritual-close" type="button" aria-label="Close" data-close-ritual>×</button>
-    <div class="qi-lock__ritual-wheel" aria-hidden="true">✦</div>
+    <button class="qi-sacred__menu-toggle" type="button" aria-expanded="false" aria-controls="QiSacredMenu-{{ section.id }}" data-menu-toggle>
+      <span></span><span></span><span></span><span class="visually-hidden">Menu</span>
+    </button>
+
+    <nav id="QiSacredMenu-{{ section.id }}" class="qi-sacred__links" aria-label="Main navigation" data-menu>
+      {% if section.settings.menu != blank %}
+        {% for link in section.settings.menu.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+      {% else %}
+        <a href="#QiSacredHero-{{ section.id }}">Home</a>
+        <a href="{{ routes.root_url }}pages/about">About</a>
+        <a href="#QiJourney-{{ section.id }}">How it works</a>
+        <a href="{{ routes.collections_url }}">Crystals</a>
+        <a href="{{ routes.blogs_url }}">Journal</a>
+      {% endif %}
+    </nav>
+
+    <div class="qi-sacred__actions">
+      <a class="qi-sacred__account" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
+        {% if customer %}ACCOUNT{% else %}SIGN IN{% endif %} <span>＋</span>
+      </a>
+      <a class="qi-sacred__cart" href="{{ routes.cart_url }}" aria-label="Cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Zm3 0V6a3 3 0 0 1 6 0v2"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <div class="qi-sacred__stage">
+    <div class="qi-sacred__copy">
+      <p class="qi-sacred__eyebrow"><span>✦</span>{{ section.settings.eyebrow }}</p>
+      <h1>{{ section.settings.heading }}</h1>
+      <div class="qi-sacred__intro">{{ section.settings.text }}</div>
+      <button class="qi-sacred__primary" type="button" data-open-reading>{{ section.settings.cta }} <span>＋</span></button>
+      <div class="qi-sacred__requirements" aria-label="Birth information required">
+        <span><i>☉</i>Birth Date</span><span><i>☾</i>Birth Time</span><span><i>⌖</i>Birth Place</span>
+      </div>
+      <p class="qi-sacred__micro">Personal Reflection&nbsp;&nbsp;•&nbsp;&nbsp;Crystal Recommendation</p>
+    </div>
+
+    <div class="qi-sacred__oracle" aria-label="Sacred astrology guide">
+      <div class="qi-sacred__beam" aria-hidden="true"></div>
+      {% if section.settings.priestess != blank %}
+        {{ section.settings.priestess | image_url: width: 1600 | image_tag: class: 'qi-sacred__priestess qi-sacred__priestess--custom', loading: 'eager', fetchpriority: 'high', widths: '480,720,960,1200,1600', sizes: '(max-width: 899px) 100vw, 44vw', alt: 'Sacred astrology guide' }}
+      {% else %}
+        <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-priestess.png' | asset_url }}" alt="Sacred astrology guide surrounded by a celestial wheel and crystals" width="836" height="1814" loading="eager" fetchpriority="high">
+      {% endif %}
+      <span class="qi-sacred__oracle-vignette" aria-hidden="true"></span>
+    </div>
+
+    <aside class="qi-sacred__record" id="QiRecord-{{ section.id }}" data-reading-panel>
+      <div class="qi-sacred__record-cap" aria-hidden="true"><span>✦</span></div>
+      <h2>{{ section.settings.form_heading }}</h2>
+      <p>{{ section.settings.form_text }}</p>
+      <div class="qi-sacred__ornament" aria-hidden="true"><span></span>✦<span></span></div>
+
+      <form class="qi-sacred__form" data-astral-form novalidate>
+        <label class="qi-sacred__field"><span><b>01</b> WHAT SHOULD WE CALL YOU?</span><span class="qi-sacred__input"><input name="name" autocomplete="name" placeholder="Enter your name" required><i>♙</i></span></label>
+        <label class="qi-sacred__field"><span><b>02</b> WHEN DID YOUR JOURNEY BEGIN?</span><span class="qi-sacred__input"><input name="birth_date" type="date" required><i>▣</i></span></label>
+        <label class="qi-sacred__field"><span><b>03</b> WHERE WERE THE STARS ALIGNED?</span><span class="qi-sacred__input"><input name="birth_place" autocomplete="address-level2" placeholder="Enter your birth place" required><i>⌖</i></span></label>
+        <fieldset>
+          <legend><b>04</b> WHAT ARE YOU SEEKING CLARITY ON?<small>(Choose one)</small></legend>
+          <div class="qi-sacred__intentions">
+            <label><input type="radio" name="intention" value="Emotional Balance" required><span><i>☾</i>Emotional<br>Balance</span></label>
+            <label><input type="radio" name="intention" value="Purpose & Growth"><span><i>✦</i>Purpose &<br>Growth</span></label>
+            <label><input type="radio" name="intention" value="Love & Connection"><span><i>♡</i>Love &<br>Connection</span></label>
+          </div>
+        </fieldset>
+        <button class="qi-sacred__submit" type="submit">{{ section.settings.submit_text }} <span>＋</span></button>
+        <p class="qi-sacred__privacy">♙ &nbsp;Your information is sacred and protected.<br>We respect your privacy.</p>
+        <p class="qi-sacred__status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+    </aside>
+  </div>
+
+  <div id="QiJourney-{{ section.id }}" class="qi-sacred__journey">
+    <p>ANCIENT WISDOM. PERSONALIZED FOR YOU.</p>
+    <h2>A Journey Into Your True Essence</h2>
+    <div class="qi-sacred__journey-rule" aria-hidden="true"><span></span>✦<span></span></div>
+    <div class="qi-sacred__pillars">
+      <article><i>☉</i><h3>PERSONAL REFLECTION</h3><p>Thoughtful interpretation of your birth chart patterns.</p></article>
+      <article><i>◉</i><h3>ENERGY INSIGHTS</h3><p>Understand your strengths, challenges and hidden gifts.</p></article>
+      <article><i>♢</i><h3>CRYSTAL ALIGNMENT</h3><p>Discover the crystal that symbolically resonates with your energy.</p></article>
+      <article><i>◯</i><h3>PERSONAL BRACELET</h3><p>Wear your intention and stay connected to your chosen path.</p></article>
+    </div>
+  </div>
+
+  <dialog class="qi-sacred__ritual" data-ritual-dialog>
+    <button class="qi-sacred__ritual-close" type="button" aria-label="Close" data-close-ritual>×</button>
+    <div class="qi-sacred__ritual-wheel" aria-hidden="true">✦</div>
     <p data-ritual-stage>ALIGNING YOUR CELESTIAL PATTERNS…</p>
   </dialog>
 </section>
 
 {% schema %}
 {
-  "name": "QI Final Visual Lock",
+  "name": "QI Visual Reconstruction V4",
   "tag": "section",
-  "class": "section-qi-final-visual-lock",
+  "class": "section-qi-sacred-hero",
   "settings": [
-    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","info":"Optional. Leave blank until your secure server endpoint is ready."}
+    {"type":"image_picker","id":"priestess","label":"Priestess image"},
+    {"type":"link_list","id":"menu","label":"Navigation menu"},
+    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","info":"Optional. Leave blank until your secure server endpoint is ready."},
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
+    {"type":"inline_richtext","id":"heading","label":"Heading","default":"Reveal The Story Written In Your Stars"},
+    {"type":"richtext","id":"text","label":"Introduction","default":"<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>"},
+    {"type":"text","id":"cta","label":"Primary button","default":"BEGIN YOUR READING"},
+    {"type":"text","id":"form_heading","label":"Form heading","default":"YOUR ASTRAL PROFILE"},
+    {"type":"textarea","id":"form_text","label":"Form introduction","default":"Share your birth details to reveal your energy map."},
+    {"type":"text","id":"submit_text","label":"Submit button","default":"REVEAL MY ENERGY MAP"}
   ],
-  "presets": [{"name":"QI Final Visual Lock"}]
+  "presets": [{"name":"QI Visual Reconstruction V4"}]
 }
 {% endschema %}
