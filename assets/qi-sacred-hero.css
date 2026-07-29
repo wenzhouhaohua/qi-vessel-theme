@@ -381,3 +381,36 @@
   .qi-sacred__copy h1{font-size:clamp(48px,3.4vw,61px)}
   .qi-sacred__intro{margin-block:19px;font-size:10.5px}
 }
+
+/* V6 — true single-scene repair. The oracle artwork is now the full Hero world,
+   never a centered rectangular image. Side gradients protect copy/form legibility. */
+.qi-sacred__cosmos{
+  background-image:
+    linear-gradient(90deg,rgba(1,2,7,.96) 0%,rgba(1,2,7,.72) 19%,rgba(1,2,7,.08) 38%,rgba(1,2,7,.04) 62%,rgba(1,2,7,.70) 82%,rgba(1,2,7,.97) 100%),
+    linear-gradient(180deg,rgba(1,2,7,.08) 0%,rgba(1,2,7,.04) 68%,rgba(1,2,7,.72) 100%),
+    url('qi-hero-scene-final.webp');
+  background-size:cover;
+  background-position:center 22%;
+  background-repeat:no-repeat;
+}
+.qi-sacred__nebula,.qi-sacred__stars,.qi-sacred__light-column,.qi-sacred__dust{opacity:.10!important}
+.qi-sacred__oracle{pointer-events:none;background:transparent!important}
+.qi-sacred__priestess{display:none!important}
+.qi-sacred__oracle:before{opacity:.18!important;mix-blend-mode:screen}
+.qi-sacred__oracle:after{opacity:.28!important}
+.qi-sacred__oracle-vignette{background:transparent!important}
+@media(min-width:900px){
+  .qi-sacred__stage{grid-template-columns:25% 49% 26%;min-height:calc(100svh - 78px)}
+  .qi-sacred__copy{z-index:4;padding-left:8px}
+  .qi-sacred__record{z-index:5;margin-left:0;background:linear-gradient(180deg,rgba(5,5,12,.88),rgba(2,3,8,.95));backdrop-filter:blur(14px) saturate(1.05)}
+}
+@media(max-width:899px){
+  .qi-sacred__cosmos{background-position:center top;background-size:auto 610px;background-color:#020309}
+  .qi-sacred__oracle{height:390px}
+  .qi-sacred__record{margin-top:-38px}
+}
+@media(max-width:520px){
+  .qi-sacred__cosmos{background-size:auto 520px;background-position:center top}
+  .qi-sacred__oracle{height:315px}
+  .qi-sacred__record{margin-top:-24px}
+}
