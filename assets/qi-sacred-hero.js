@@ -37,7 +37,8 @@
         const y = ((event.clientY - rect.top) / rect.height - .5);
         root.style.setProperty('--qi-x', `${x * 10}px`);
         root.style.setProperty('--qi-y', `${y * 7}px`);
-        root.querySelector('.qi-sacred__priestess')?.style.setProperty('transform', `translateX(calc(50% + ${x * 8}px)) translateY(${y * 5}px)`);
+        root.style.setProperty('--qi-oracle-x', `${x * 6}px`);
+        root.style.setProperty('--qi-oracle-y', `${y * 4}px`);
       }, { passive: true });
     }
 

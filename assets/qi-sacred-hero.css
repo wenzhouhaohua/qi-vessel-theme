@@ -221,3 +221,79 @@
   .qi-sacred__privacy{font-size:7.5px!important}
   .qi-sacred__copy{margin-top:34px;padding-bottom:20px}
 }
+
+/* V4 — Production Hero V2: one immersive scene, stronger conversion hierarchy */
+.qi-sacred{--qi-stage-max:1510px;background:#010207}
+.qi-sacred__cosmos{overflow:hidden;background:
+  radial-gradient(ellipse at 50% 28%,rgba(99,49,101,.34) 0,rgba(40,20,49,.17) 28%,transparent 55%),
+  radial-gradient(ellipse at 8% 55%,rgba(111,54,66,.12),transparent 38%),
+  radial-gradient(ellipse at 92% 48%,rgba(77,44,105,.14),transparent 40%),
+  linear-gradient(180deg,#020207 0%,#05030b 54%,#010207 100%)}
+.qi-sacred__cosmos:before{opacity:.18;animation:qiStarDrift 32s linear infinite}
+.qi-sacred__cosmos:after{opacity:.10;animation:qiStarDrift 46s linear infinite reverse}
+.qi-sacred__nebula{animation:qiNebulaBreath 18s ease-in-out infinite alternate}
+.qi-sacred__nebula--one{left:18%;top:5%;width:700px;height:650px;opacity:.32}
+.qi-sacred__nebula--two{left:52%;top:2%;width:650px;height:650px;opacity:.30}
+.qi-sacred__temple{position:absolute;top:70px;bottom:0;width:min(18vw,270px);opacity:.46;filter:drop-shadow(0 0 32px rgba(0,0,0,.9));background:
+ linear-gradient(90deg,transparent,rgba(216,166,88,.08),transparent),
+ repeating-linear-gradient(90deg,rgba(219,166,89,.12) 0 2px,transparent 2px 18px),
+ linear-gradient(180deg,rgba(19,13,21,.15),rgba(8,6,13,.86));border-left:1px solid rgba(217,168,93,.14);border-right:1px solid rgba(217,168,93,.08)}
+.qi-sacred__temple:before,.qi-sacred__temple:after{content:"";position:absolute;left:-12%;right:-12%;height:46px;border:1px solid rgba(217,168,93,.18);background:linear-gradient(180deg,rgba(30,21,30,.75),rgba(5,5,10,.75));box-shadow:0 12px 35px #000}
+.qi-sacred__temple:before{top:6%}.qi-sacred__temple:after{bottom:4%}
+.qi-sacred__temple--left{left:0}.qi-sacred__temple--right{right:0;transform:scaleX(-1)}
+.qi-sacred__dust{position:absolute;inset:8% 10% 0;background-image:radial-gradient(circle,rgba(255,218,152,.75) 0 1px,transparent 1.4px);background-size:91px 77px;opacity:.13;animation:qiDustFloat 24s ease-in-out infinite alternate}
+.qi-sacred__light-column{left:50%;width:12px;height:78%;opacity:.54;filter:blur(10px);background:linear-gradient(180deg,rgba(255,236,199,0),rgba(255,228,178,.5) 17%,#fff2d5 42%,rgba(234,175,93,.45) 68%,transparent);box-shadow:0 0 70px rgba(244,190,106,.38)}
+.qi-sacred__nav{width:min(var(--qi-stage-max),calc(100% - 72px));grid-template-columns:270px 1fr 190px}
+.qi-sacred__stage{width:min(var(--qi-stage-max),calc(100% - 72px));min-height:820px;grid-template-columns:22% 56% 22%;align-items:stretch}
+.qi-sacred__copy{padding-right:18px;transform:translateY(-8px)}
+.qi-sacred__copy h1{max-width:315px;font-size:clamp(48px,3.65vw,64px);line-height:.98;letter-spacing:-.025em}
+.qi-sacred__intro{max-width:295px;margin-top:27px;font-size:11.5px;line-height:1.85}
+.qi-sacred__primary{width:230px}
+.qi-sacred__requirements{gap:26px}
+.qi-sacred__oracle{margin-inline:-4%;overflow:visible;isolation:isolate}
+.qi-sacred__oracle:before{top:5%;width:min(45vw,650px);height:min(45vw,650px);opacity:.64;animation:qiHaloSpin 150s linear infinite;box-shadow:0 0 85px rgba(217,168,93,.13),inset 0 0 55px rgba(217,168,93,.07)}
+.qi-sacred__oracle:after{bottom:7px;width:min(38vw,560px);height:150px;opacity:.62}
+.qi-sacred__priestess{width:112%;height:100%;object-fit:cover;object-position:50% 18%;filter:saturate(.78) contrast(1.02) brightness(.82) sepia(.08) drop-shadow(0 0 32px rgba(237,187,112,.13));opacity:.96;mask-image:radial-gradient(ellipse 70% 78% at 50% 48%,#000 38%,rgba(0,0,0,.98) 64%,transparent 100%);animation:qiOracleFloat 9s ease-in-out infinite}
+.qi-sacred__beam{height:60%;width:8px;opacity:.56;filter:blur(8px);box-shadow:0 0 55px rgba(245,184,93,.48)}
+.qi-sacred__oracle-vignette{inset:-4%;background:
+ radial-gradient(ellipse at 50% 42%,transparent 42%,rgba(2,3,8,.22) 68%,rgba(2,3,8,.72) 100%),
+ linear-gradient(90deg,rgba(2,3,8,.94),transparent 13%,transparent 87%,rgba(2,3,8,.94)),
+ linear-gradient(180deg,transparent 70%,#020308 100%)}
+.qi-sacred__record{min-height:650px;margin:52px 0 42px -18px;padding:58px 24px 22px;background:
+ radial-gradient(circle at 50% -5%,rgba(231,183,104,.13),transparent 29%),
+ linear-gradient(180deg,rgba(7,8,15,.76),rgba(3,4,9,.91));-webkit-backdrop-filter:blur(18px) saturate(1.12);backdrop-filter:blur(18px) saturate(1.12);border-color:rgba(229,180,101,.52);box-shadow:0 35px 90px rgba(0,0,0,.6),0 0 58px rgba(217,168,93,.07),inset 0 1px rgba(255,245,218,.07)}
+.qi-sacred__record:before{box-shadow:-18px -18px 55px rgba(217,168,93,.05)}
+.qi-sacred__record h2{font-size:29px}.qi-sacred__record>p{font-size:9.5px}
+.qi-sacred__form{gap:11px}.qi-sacred__input input{height:44px;background:rgba(2,3,8,.64)}
+.qi-sacred__trust{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:2px;padding:9px 0 2px;border-top:1px solid rgba(217,168,93,.16)}
+.qi-sacred__trust span{display:grid;text-align:center;gap:2px}.qi-sacred__trust strong{color:#e8bd78;font:600 10px/1 Inter,sans-serif}.qi-sacred__trust small{color:#9d958f;font-size:6.8px;line-height:1.2}
+.qi-sacred__privacy{margin-top:5px!important}
+@keyframes qiHaloSpin{to{transform:translateX(-50%) rotate(360deg)}}
+@keyframes qiOracleFloat{0%,100%{transform:translateX(50%) translateY(0)}50%{transform:translateX(50%) translateY(-5px)}}
+@keyframes qiStarDrift{to{transform:translate3d(25px,18px,0)}}
+@keyframes qiNebulaBreath{to{transform:scale(1.08) translate3d(12px,-8px,0);opacity:.5}}
+@keyframes qiDustFloat{to{transform:translateY(-20px);opacity:.2}}
+@media(prefers-reduced-motion:reduce){.qi-sacred__oracle:before,.qi-sacred__priestess,.qi-sacred__cosmos:before,.qi-sacred__cosmos:after,.qi-sacred__nebula,.qi-sacred__dust{animation:none!important}}
+
+@media(max-width:1180px) and (min-width:900px){
+ .qi-sacred__stage{grid-template-columns:24% 50% 26%}.qi-sacred__copy h1{font-size:50px}.qi-sacred__record{margin-left:-10px;padding-inline:20px}.qi-sacred__links{gap:28px}
+}
+@media(max-width:899px){
+ .qi-sacred__temple{display:none}.qi-sacred__nav{width:calc(100% - 28px)}
+ .qi-sacred__stage{display:flex;flex-direction:column;min-height:auto;padding-bottom:26px}
+ .qi-sacred__oracle{order:1;position:relative;inset:auto;height:390px;width:100%;margin:0;overflow:hidden}
+ .qi-sacred__oracle:before{top:2%;width:430px;height:430px;opacity:.58}.qi-sacred__oracle:after{bottom:5px;width:360px;height:100px}
+ .qi-sacred__priestess{width:112%;height:430px;object-position:50% 22%;opacity:.9;mask-image:linear-gradient(to bottom,#000 0 70%,transparent 100%)}
+ .qi-sacred__oracle-vignette{background:linear-gradient(180deg,transparent 48%,#020308 100%),radial-gradient(ellipse at 50% 38%,transparent 30%,rgba(2,3,8,.5) 92%)}
+ .qi-sacred__record{order:2;width:calc(100% - 22px);margin:-54px auto 0;transform:none;padding:48px 16px 20px;min-height:0;z-index:8}
+ .qi-sacred__copy{order:3;margin:30px auto 0;padding:0 22px 28px;transform:none}
+ .qi-sacred__copy h1{max-width:570px;font-size:clamp(43px,10vw,58px)}
+ .qi-sacred__trust{margin-top:4px}.qi-sacred__record-cap{top:-28px}
+}
+@media(max-width:520px){
+ .qi-sacred__oracle{height:330px}.qi-sacred__priestess{height:370px;width:126%;object-position:50% 18%}
+ .qi-sacred__record{margin-top:-42px;width:calc(100% - 14px);padding:45px 13px 17px}
+ .qi-sacred__record h2{font-size:27px}.qi-sacred__form{grid-template-columns:1fr 1fr;gap:9px 7px}
+ .qi-sacred__input input{height:50px;font-size:16px}.qi-sacred__submit{height:56px}
+ .qi-sacred__trust small{font-size:6.5px}.qi-sacred__copy{margin-top:25px}
+}
