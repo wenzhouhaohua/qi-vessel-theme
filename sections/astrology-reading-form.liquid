@@ -290,7 +290,9 @@
 
 <script>
 (function() {
-  const DEEPSEEK_API_KEY = 'sk-1565875642dsc45315ssds';
+  // SECURITY: Keep provider credentials on a server-side endpoint only.
+  // This legacy section should POST to a secure app proxy before production use.
+  const DEEPSEEK_API_KEY = '';
   const form = document.getElementById('qi-astro-form');
   const loading = document.getElementById('qi-loading');
   const result = document.getElementById('qi-result');

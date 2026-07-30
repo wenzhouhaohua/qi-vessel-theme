@@ -12,3 +12,60 @@
 @media(max-width:899px){.qi-sacred__nav{width:calc(100% - 24px);height:64px;grid-template-columns:1fr auto}.qi-sacred__brand-mark{width:42px;height:42px}.qi-sacred__brand-copy strong{font-size:20px}.qi-sacred__links,.qi-sacred__actions{display:none}.qi-sacred__menu-toggle{display:block;border:0;background:none;padding:8px}.qi-sacred__menu-toggle span:not(.visually-hidden){display:block;width:22px;height:1px;margin:5px;background:var(--qi-gold)}.qi-sacred__stage{width:100%;height:auto;min-height:0;padding-top:365px;display:flex;flex-direction:column}.qi-sacred__oracle{position:absolute;top:0;height:420px;align-items:flex-start}.qi-sacred__priestess{height:405px;max-height:none;margin-top:0;-webkit-mask-image:linear-gradient(#000 72%,transparent 100%);mask-image:linear-gradient(#000 72%,transparent 100%)}.qi-sacred__oracle-vignette{background:linear-gradient(180deg,transparent 54%,#020309 100%)}.qi-sacred__copy{display:none}.qi-sacred__record{position:relative;left:auto;top:auto;order:1;width:calc(100% - 18px);max-width:620px;margin:-45px auto 0;transform:none;padding:46px 14px 18px}.qi-sacred__pillars{grid-template-columns:1fr 1fr}.qi-sacred__pillars article:nth-child(2){border-right:0}.qi-sacred__journey h2{font-size:34px}}
 @media(max-width:520px){.qi-sacred__stage{padding-top:330px}.qi-sacred__oracle{height:370px}.qi-sacred__priestess{height:360px}.qi-sacred__record{width:calc(100% - 12px);margin-top:-35px;padding:44px 12px 16px}.qi-sacred__record h2{font-size:26px}.qi-sacred__form{grid-template-columns:1fr 1fr;gap:8px 7px}.qi-sacred__field:nth-of-type(1),.qi-sacred__field:nth-of-type(4),.qi-sacred__field:nth-of-type(5),.qi-sacred__submit,.qi-sacred__trust,.qi-sacred__privacy,.qi-sacred__status{grid-column:1/-1}.qi-sacred__input input{height:48px;font-size:16px}.qi-sacred__submit{height:54px}.qi-sacred__journey{padding-inline:14px}.qi-sacred__pillars{grid-template-columns:1fr}.qi-sacred__pillars article{border-right:0;border-bottom:1px solid rgba(217,168,93,.18)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Cinematic enhancement layer: depth, parallax and living celestial light. */
+.qi-sacred {
+  --qi-x: 0px;
+  --qi-y: 0px;
+  --qi-oracle-x: 0px;
+  --qi-oracle-y: 0px;
+}
+.qi-sacred::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: .52;
+  background:
+    radial-gradient(ellipse 42% 38% at calc(50% + var(--qi-x)) calc(28% + var(--qi-y)), rgba(242, 193, 119, .13), transparent 72%),
+    linear-gradient(90deg, rgba(0,0,0,.42), transparent 25%, transparent 72%, rgba(0,0,0,.42));
+  mix-blend-mode: screen;
+}
+.qi-sacred__cosmos::before,
+.qi-sacred__cosmos::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  width: min(84vw, 1120px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(230, 187, 116, .13);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  box-shadow: inset 0 0 70px rgba(214, 146, 81, .03), 0 0 80px rgba(213, 145, 80, .025);
+}
+.qi-sacred__cosmos::after {
+  width: min(57vw, 760px);
+  border-color: rgba(240, 206, 145, .19);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: qi-orbit 32s linear infinite;
+}
+.qi-sacred__nebula { animation: qi-breathe 13s ease-in-out infinite alternate; }
+.qi-sacred__nebula--two { animation-delay: -6s; }
+.qi-sacred__stars--far { animation: qi-drift 30s linear infinite alternate; }
+.qi-sacred__stars--near { animation: qi-drift 18s linear infinite alternate-reverse; }
+.qi-sacred__light-column { animation: qi-shimmer 8s ease-in-out infinite; }
+.qi-sacred__priestess { transform: translate3d(var(--qi-oracle-x), var(--qi-oracle-y), 0) scale(1.025); transition: transform .7s cubic-bezier(.2,.72,.22,1); }
+.qi-sacred__record { transition: transform .45s ease, box-shadow .45s ease, border-color .45s ease; }
+@media (hover:hover) and (min-width:900px) { .qi-sacred__record:hover { transform: translate(-50%, -47%); border-color: rgba(243, 202, 133, .72); box-shadow: 0 40px 100px rgba(0,0,0,.62), 0 0 72px rgba(217,168,93,.18), inset 0 1px 0 rgba(255,255,255,.12); } }
+.qi-sacred__submit { position: relative; overflow: hidden; letter-spacing: .14em; transition: transform .25s ease, filter .25s ease, box-shadow .25s ease; }
+.qi-sacred__submit::after { content:''; position:absolute; inset:-40% 60% -40% -35%; background:linear-gradient(100deg, transparent, rgba(255,255,255,.58), transparent); transform:skewX(-20deg); transition:inset .7s ease; }
+.qi-sacred__submit:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 15px 38px rgba(218,153,75,.42), inset 0 1px rgba(255,255,255,.6); }
+.qi-sacred__submit:hover::after { inset:-40% -35% -40% 60%; }
+@keyframes qi-orbit { to { transform: translate(-50%, -50%) rotate(342deg); } }
+@keyframes qi-breathe { to { transform: scale(1.12) translate3d(2vw, -1vh, 0); opacity: .53; } }
+@keyframes qi-drift { to { transform: translate3d(24px, -18px, 0); } }
+@keyframes qi-shimmer { 50% { opacity:.88; transform:translateX(-50%) scaleX(1.3); } }
+@media (prefers-reduced-motion:reduce) { .qi-sacred__cosmos::after,.qi-sacred__nebula,.qi-sacred__stars,.qi-sacred__light-column { animation:none; } .qi-sacred__priestess { transition:none; } }
