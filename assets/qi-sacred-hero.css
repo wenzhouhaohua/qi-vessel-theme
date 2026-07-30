@@ -86,3 +86,28 @@
 @media (hover:hover) and (min-width:900px) { .qi-sacred__record:hover { transform:translate(-50%,-47%); } }
 @media(max-width:1180px) and (min-width:900px) { .qi-sacred__copy { left:24px; width:245px; } .qi-sacred__record { left:44%; width:390px; } }
 @media(max-width:899px) { .qi-sacred__cinematic-scene { object-position:72% center; opacity:.78; } .qi-sacred__stage { padding-top:390px; } .qi-sacred__record { left:auto; width:calc(100% - 18px); } .qi-sacred__nebula--one { width:120vw; left:-55vw; opacity:.62; } }
+
+/* Mobile art direction: the oracle becomes an immersive backdrop and the form is a translucent ritual object. */
+@media(max-width:899px) {
+  .qi-sacred__stage { min-height:calc(100svh - 64px); padding:32px 0; display:grid; place-items:center; overflow:hidden; }
+  .qi-sacred__cinematic-scene { object-position:72% center; opacity:.38; filter:saturate(.7) contrast(1.05) brightness(.47); }
+  .qi-sacred__oracle { display:block; position:absolute; inset:0; height:auto; z-index:1; opacity:.88; pointer-events:none; }
+  .qi-sacred__priestess { display:block; width:100%; height:100%; max-height:none; margin:0; object-fit:cover; object-position:center 18%; transform:none; filter:saturate(.84) contrast(1.06) brightness(.7); -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 13%,#000 78%,transparent 100%); mask-image:linear-gradient(180deg,transparent 0%,#000 13%,#000 78%,transparent 100%); }
+  .qi-sacred__oracle-vignette { display:block; background:radial-gradient(ellipse at 50% 40%,transparent 14%,rgba(2,3,9,.12) 47%,#020309 100%),linear-gradient(90deg,rgba(2,3,9,.36),transparent 30%,transparent 70%,rgba(2,3,9,.36)); }
+  .qi-sacred__record { position:relative; left:auto; top:auto; z-index:8; width:min(92vw,520px); margin:0 auto; transform:none; padding:45px 18px 20px; border-color:rgba(242,201,132,.55); border-radius:22px; background:linear-gradient(145deg,rgba(19,12,23,.57),rgba(5,5,12,.62)); -webkit-backdrop-filter:blur(22px) saturate(145%); backdrop-filter:blur(22px) saturate(145%); box-shadow:0 28px 70px rgba(0,0,0,.56),0 0 48px rgba(217,168,93,.13),inset 0 1px 0 rgba(255,255,255,.14); }
+  .qi-sacred__record h2 { font-size:31px; }
+  .qi-sacred__record>p { max-width:285px; font-size:10px; }
+  .qi-sacred__form { gap:8px; }
+  .qi-sacred__input input { height:46px; background:rgba(2,2,7,.38); font-size:16px; }
+  .qi-sacred__submit { height:52px; margin-top:6px; }
+  .qi-sacred__trust { padding-top:10px; }
+  .qi-sacred__privacy { margin-top:6px!important; font-size:7px!important; }
+}
+@media(max-width:520px) {
+  .qi-sacred__stage { min-height:calc(100svh - 64px); padding:20px 0; }
+  .qi-sacred__oracle { opacity:.78; }
+  .qi-sacred__priestess { object-position:center 12%; }
+  .qi-sacred__record { width:calc(100% - 22px); padding:42px 14px 18px; }
+  .qi-sacred__form { grid-template-columns:1fr; }
+  .qi-sacred__field,.qi-sacred__field:nth-of-type(1),.qi-sacred__field:nth-of-type(4),.qi-sacred__field:nth-of-type(5),.qi-sacred__submit,.qi-sacred__trust,.qi-sacred__privacy,.qi-sacred__status { grid-column:auto; }
+}
