@@ -337,3 +337,50 @@
   .qi-sacred__cinematic-scene--mobile { filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06); }
   .qi-sacred__record { background:linear-gradient(145deg,rgba(74,55,48,.29),rgba(45,34,40,.25)); }
 }
+
+/* V13 final palette: a clear blue-violet observatory with cool-gold ritual glass. */
+.qi-sacred { background:#080b25; }
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.92) contrast(1.08) brightness(.74) hue-rotate(8deg);
+}
+.qi-sacred__cosmos::after {
+  content:'';
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(6,9,35,.46),rgba(19,17,60,.16) 33%,rgba(20,16,61,.13) 67%,rgba(6,9,35,.38)),
+    linear-gradient(180deg,rgba(10,12,45,.28),transparent 35%,rgba(5,8,31,.34));
+  mix-blend-mode:multiply;
+}
+.qi-sacred::before { background:linear-gradient(180deg,#10134a 0%,#090c2b 65%,#06081e 100%); }
+.qi-sacred__nebula,.qi-sacred__light-column,.qi-sacred__dust { display:none; }
+.qi-sacred__stars { opacity:.25; mix-blend-mode:screen; }
+.qi-sacred__nav {
+  background:linear-gradient(90deg,rgba(8,12,37,.77),rgba(18,18,58,.58),rgba(8,12,37,.77));
+  border-bottom-color:rgba(211,192,126,.32);
+  -webkit-backdrop-filter:blur(10px) saturate(120%);
+  backdrop-filter:blur(10px) saturate(120%);
+}
+.qi-sacred__brand,.qi-sacred__links a,.qi-sacred__copy h1 { color:#f4f1e9; }
+.qi-sacred__brand,.qi-sacred__eyebrow,.qi-sacred__links a:first-child { color:#d8c789; }
+.qi-sacred__intro,.qi-sacred__benefits { color:#e8e9f1; text-shadow:0 2px 12px rgba(3,6,25,.52); }
+.qi-sacred__benefits { border-top-color:rgba(211,192,126,.36); }
+.qi-sacred__record {
+  background:linear-gradient(145deg,rgba(16,27,66,.47),rgba(9,15,45,.43));
+  border-color:rgba(219,205,145,.64);
+  -webkit-backdrop-filter:blur(11px) saturate(126%);
+  backdrop-filter:blur(11px) saturate(126%);
+  box-shadow:0 28px 72px rgba(2,5,25,.42),0 0 46px rgba(184,173,111,.15),inset 0 1px 0 rgba(255,255,255,.20);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#f0df9d; text-shadow:0 2px 14px rgba(0,0,0,.34); }
+.qi-sacred__input input { background:rgba(5,13,41,.43); border-color:rgba(219,205,145,.43); color:#f8f7f2; }
+.qi-sacred__input input::placeholder { color:rgba(234,236,245,.70); }
+.qi-sacred__submit { background:linear-gradient(105deg,#bbae6f,#e2d69a 50%,#bcae71); border-color:#e1d594; color:#15172e; box-shadow:0 12px 28px rgba(143,131,73,.25),inset 0 1px 0 rgba(255,255,255,.56); }
+.qi-sacred__trust strong,.qi-sacred__input i { color:#e1d394; }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { filter:saturate(.92) contrast(1.08) brightness(.74) hue-rotate(8deg); }
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(16,27,66,.45),rgba(9,15,45,.41)); }
+}
