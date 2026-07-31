@@ -12,6 +12,22 @@
     const dialog = root.querySelector('[data-ritual-dialog]');
     const stage = root.querySelector('[data-ritual-stage]');
     const closeDialog = root.querySelector('[data-close-ritual]');
+    const ritualLoading = root.querySelector('[data-ritual-loading]');
+    const readingResult = root.querySelector('[data-reading-result]');
+    const readingReport = root.querySelector('[data-reading-report]');
+    const readingLocation = root.querySelector('[data-reading-location]');
+
+    const showRitualLoading = () => {
+      ritualLoading?.removeAttribute('hidden');
+      readingResult?.setAttribute('hidden', '');
+    };
+
+    const showReadingResult = (result) => {
+      ritualLoading?.setAttribute('hidden', '');
+      if (readingReport) readingReport.textContent = result.report || result.message || '';
+      if (readingLocation) readingLocation.textContent = result.location ? `Birthplace resolved as ${result.location}` : '';
+      readingResult?.removeAttribute('hidden');
+    };
 
     openButtons.forEach((button) => button.addEventListener('click', () => {
       panel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -102,7 +118,9 @@
       const endpoint = root.dataset.apiEndpoint?.trim();
       const stages = ['ALIGNING YOUR CELESTIAL PATTERNS…', 'READING YOUR ENERGY SIGNATURE…', 'PREPARING YOUR SACRED MAP…'];
       let index = 0;
+      let keepDialogOpen = false;
       stage.textContent = stages[index];
+      showRitualLoading();
       dialog?.showModal();
       const stageTimer = window.setInterval(() => {
         index = (index + 1) % stages.length;
@@ -119,7 +137,11 @@
           if (!response.ok) throw new Error('Reading service unavailable');
           const result = await response.json();
           if (result.redirect_url) window.location.assign(result.redirect_url);
-          else status.textContent = result.message || 'Your astral profile is ready.';
+          else if (result.report) {
+            showReadingResult(result);
+            keepDialogOpen = true;
+            status.textContent = 'Your astral profile is ready.';
+          } else status.textContent = result.message || 'Your astral profile is ready.';
         } else {
           await new Promise((resolve) => window.setTimeout(resolve, 2700));
           status.textContent = `Thank you, ${payload.name}. Your sacred profile has been received.`;
@@ -128,7 +150,7 @@
         status.textContent = 'The stars are briefly obscured. Please try again in a moment.';
       } finally {
         window.clearInterval(stageTimer);
-        dialog?.close();
+        if (!keepDialogOpen) dialog?.close();
       }
     });
   };

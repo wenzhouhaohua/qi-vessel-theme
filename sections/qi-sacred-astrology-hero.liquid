@@ -126,8 +126,18 @@
 
   <dialog class="qi-sacred__ritual" data-ritual-dialog>
     <button class="qi-sacred__ritual-close" type="button" aria-label="Close" data-close-ritual>×</button>
-    <div class="qi-sacred__ritual-wheel" aria-hidden="true">✦</div>
-    <p data-ritual-stage>ALIGNING YOUR CELESTIAL PATTERNS…</p>
+    <div class="qi-sacred__ritual-loading" data-ritual-loading>
+      <div class="qi-sacred__ritual-wheel" aria-hidden="true">✦</div>
+      <p data-ritual-stage>ALIGNING YOUR CELESTIAL PATTERNS…</p>
+    </div>
+    <article class="qi-sacred__reading-result" data-reading-result hidden>
+      <p class="qi-sacred__reading-kicker">YOUR CELESTIAL READING</p>
+      <h2>Your Astral Profile</h2>
+      <p class="qi-sacred__reading-location" data-reading-location></p>
+      <div class="qi-sacred__reading-report" data-reading-report></div>
+      <a class="qi-sacred__reading-cta" href="{{ routes.collections_url }}">EXPLORE YOUR ALIGNED BRACELETS <span>＋</span></a>
+      <p class="qi-sacred__reading-note">For reflection and personal inspiration. Your path is always your own.</p>
+    </article>
   </dialog>
 </section>
 
