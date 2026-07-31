@@ -137,10 +137,14 @@
       <p class="qi-sacred__reading-location" data-reading-location></p>
       <p class="qi-sacred__reading-opening" data-reading-opening></p>
       <section class="qi-sacred__big-three" aria-label="Your Big Three" data-reading-big-three></section>
-      <section class="qi-sacred__reading-section">
-        <p class="qi-sacred__reading-section-label">YOUR CURRENT PATTERN</p>
-        <h3 data-reading-attention-title>What Wants Your Attention</h3>
-        <p data-reading-attention-body></p>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--tension">
+        <p class="qi-sacred__reading-section-label">YOUR CURRENT TENSION</p>
+        <h3 data-reading-tension-title>Where Your Energy Leaks</h3>
+        <p data-reading-tension-body></p>
+      </section>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--cost" data-reading-cost-section hidden>
+        <p class="qi-sacred__reading-section-label">WHAT THIS MAY COST YOU</p>
+        <ul class="qi-sacred__cost-list" data-reading-cost-list></ul>
       </section>
       <section class="qi-sacred__reading-section qi-sacred__reading-section--ritual">
         <p class="qi-sacred__reading-section-label">YOUR RITUAL INTENTION</p>
@@ -152,6 +156,10 @@
         <h3 data-reading-bracelet-title></h3>
         <div class="qi-sacred__crystal-chips" data-reading-crystals></div>
         <p data-reading-bracelet-reason></p>
+        <div class="qi-sacred__bracelet-ritual" data-reading-bracelet-ritual-wrap hidden>
+          <span>WEAR IT AS A CUE</span>
+          <p data-reading-bracelet-ritual></p>
+        </div>
         <a class="qi-sacred__reading-cta" href="{{ routes.collections_url }}" data-reading-cta>EXPLORE YOUR ALIGNED BRACELETS <span>＋</span></a>
       </section>
       <p class="qi-sacred__reading-note" data-reading-note>For reflection and personal inspiration. Your path is always your own.</p>

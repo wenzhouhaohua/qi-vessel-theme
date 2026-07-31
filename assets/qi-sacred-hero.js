@@ -19,12 +19,18 @@
     const readingTitle = root.querySelector('[data-reading-title]');
     const readingOpening = root.querySelector('[data-reading-opening]');
     const readingBigThree = root.querySelector('[data-reading-big-three]');
-    const attentionTitle = root.querySelector('[data-reading-attention-title]');
-    const attentionBody = root.querySelector('[data-reading-attention-body]');
+  const attentionTitle = root.querySelector('[data-reading-attention-title]');
+  const attentionBody = root.querySelector('[data-reading-attention-body]');
+  const tensionTitle = root.querySelector('[data-reading-tension-title]');
+  const tensionBody = root.querySelector('[data-reading-tension-body]');
+  const readingCostSection = root.querySelector('[data-reading-cost-section]');
+  const readingCostList = root.querySelector('[data-reading-cost-list]');
     const ritualIntention = root.querySelector('[data-reading-ritual-intention]');
     const ritualPractice = root.querySelector('[data-reading-ritual-practice]');
     const braceletTitle = root.querySelector('[data-reading-bracelet-title]');
-    const braceletReason = root.querySelector('[data-reading-bracelet-reason]');
+  const braceletReason = root.querySelector('[data-reading-bracelet-reason]');
+  const braceletRitual = root.querySelector('[data-reading-bracelet-ritual]');
+  const braceletRitualWrap = root.querySelector('[data-reading-bracelet-ritual-wrap]');
     const readingCrystals = root.querySelector('[data-reading-crystals]');
     const readingCta = root.querySelector('[data-reading-cta]');
     const readingNote = root.querySelector('[data-reading-note]');
@@ -42,12 +48,28 @@
       if (readingTitle) readingTitle.textContent = profile.title || 'Your Astral Profile';
       if (readingLocation) readingLocation.textContent = result.location ? `Birthplace resolved as ${result.location}` : '';
       if (readingOpening) readingOpening.textContent = profile.opening || result.report || result.message || '';
-      if (attentionTitle) attentionTitle.textContent = profile.attention?.title || 'What Wants Your Attention';
-      if (attentionBody) attentionBody.textContent = profile.attention?.body || '';
+    if (attentionTitle) attentionTitle.textContent = profile.attention?.title || 'What Wants Your Attention';
+    if (attentionBody) attentionBody.textContent = profile.attention?.body || '';
+    if (tensionTitle) tensionTitle.textContent = profile.tension?.title || profile.attention?.title || 'Where Your Energy Leaks';
+    if (tensionBody) tensionBody.textContent = profile.tension?.body || profile.attention?.body || '';
+
+    if (readingCostList) {
+      readingCostList.replaceChildren();
+      const costs = Array.isArray(profile.cost_now) ? profile.cost_now.slice(0, 3) : [];
+      costs.forEach((cost) => {
+        const item = document.createElement('li');
+        item.textContent = cost;
+        readingCostList.append(item);
+      });
+      if (readingCostSection) readingCostSection.hidden = !readingCostList.childElementCount;
+    }
       if (ritualIntention) ritualIntention.textContent = profile.ritual?.intention || 'Return to your own rhythm.';
       if (ritualPractice) ritualPractice.textContent = profile.ritual?.practice || '';
-      if (braceletTitle) braceletTitle.textContent = profile.bracelet?.title || 'Your Aligned Bracelet';
-      if (braceletReason) braceletReason.textContent = profile.bracelet?.reason || '';
+    if (braceletTitle) braceletTitle.textContent = profile.bracelet?.title || 'Your Aligned Bracelet';
+    if (braceletReason) braceletReason.textContent = profile.bracelet?.reason || '';
+    const braceletCue = profile.bracelet?.ritual || profile.ritual?.bracelet_cue || '';
+    if (braceletRitual) braceletRitual.textContent = braceletCue;
+    if (braceletRitualWrap) braceletRitualWrap.hidden = !braceletCue;
       if (readingNote) readingNote.textContent = profile.disclaimer || 'For reflection and personal inspiration. Your path is always your own.';
       if (readingCta) {
         const label = document.createTextNode(profile.bracelet?.cta_label || 'EXPLORE YOUR ALIGNED BRACELETS');

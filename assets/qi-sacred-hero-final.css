@@ -53,6 +53,14 @@
 .qi-sacred__big-three p,.qi-sacred__reading-section>p,.qi-sacred__bracelet-card>p { margin:0; color:#e7e8f0; font-size:13px; line-height:1.62; }
 .qi-sacred__reading-section { padding:21px 0; border-top:1px solid rgba(224,204,139,.23); }
 .qi-sacred__reading-section--ritual { padding:20px; border:1px solid rgba(224,204,139,.34); border-radius:12px; background:linear-gradient(135deg,rgba(186,158,85,.16),rgba(88,114,184,.12)); }
+.qi-sacred__reading-section--tension { border-top-color:rgba(229,205,139,.42); }
+.qi-sacred__reading-section--cost { margin-top:2px; padding:18px 20px; border:1px solid rgba(224,204,139,.24); border-radius:12px; background:linear-gradient(135deg,rgba(35,55,108,.34),rgba(130,90,65,.12)); }
+.qi-sacred__cost-list { display:grid; gap:10px; margin:12px 0 0; padding:0; list-style:none; }
+.qi-sacred__cost-list li { position:relative; padding-left:20px; color:#f1edf0; font-size:13px; line-height:1.5; }
+.qi-sacred__cost-list li::before { content:'✦'; position:absolute; left:0; color:#e0cc8b; }
+.qi-sacred__bracelet-ritual { margin-top:14px; padding-top:14px; border-top:1px solid rgba(224,204,139,.24); }
+.qi-sacred__bracelet-ritual span { display:block; color:#e0cc8b; font-size:10px; font-weight:700; letter-spacing:.13em; }
+.qi-sacred__bracelet-ritual p { margin:7px 0 0; }
 .qi-sacred__reading-section-label { margin:0 0 8px; color:#ddc36e; font-size:9px; font-weight:700; letter-spacing:.17em; }
 .qi-sacred__reading-section h3,.qi-sacred__bracelet-card h3 { margin:0 0 9px; color:#f6e2a3; font:500 27px/1.08 "Cormorant Garamond",serif; }
 .qi-sacred__bracelet-card { margin-top:24px; padding:24px; border:1px solid rgba(229,207,141,.55); border-radius:14px; background:radial-gradient(circle at 16% 0,rgba(225,199,115,.17),transparent 45%),rgba(5,13,38,.45); }
