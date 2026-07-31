@@ -337,3 +337,18 @@
   .qi-sacred__cinematic-scene--mobile { filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06); }
   .qi-sacred__record { background:linear-gradient(145deg,rgba(74,55,48,.29),rgba(45,34,40,.25)); }
 }
+
+/* V14 composition-only correction: keep the guardian's full face above the form. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-face-clear 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 92px),0) scale(1.01);
+  }
+  .qi-sacred__record { transform:translate(-50%,-38%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-39%); }
+}
+@keyframes qi-guardian-face-clear { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 102px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 74px),0) scale(1.02); }
+}
