@@ -7,6 +7,21 @@ const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(b
   headers: { 'Content-Type': 'application/json; charset=UTF-8', ...headers }
 });
 
+const fetchWithTimeout = async (url, options, timeoutMs, label) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    if (!response.ok) throw new Error(`${label} returned ${response.status}.`);
+    return response;
+  } catch (error) {
+    if (error?.name === 'AbortError') throw new Error(`${label} timed out.`);
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 const corsHeaders = (request, env) => {
   const origin = request.headers.get('Origin');
   const allowed = (env.ALLOWED_ORIGIN || DEFAULT_ORIGIN).split(',').map((value) => value.trim());
@@ -43,10 +58,9 @@ const getBirthLocation = async (birthPlace, env) => {
   url.searchParams.set('q', birthPlace);
   url.searchParams.set('limit', '1');
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     headers: { 'X-API-Key': env.ROXY_API_KEY }
-  });
-  if (!response.ok) throw new Error('The birthplace lookup service is unavailable.');
+  }, 5000, 'Birthplace lookup');
 
   const data = await response.json();
   const place = data?.cities?.[0];
@@ -73,7 +87,7 @@ const utcOffsetAtBirth = (date, time, timeZone) => {
 
 const requestNatalChart = async (reading, location, env) => {
   const timezone = utcOffsetAtBirth(reading.birth_date, reading.birth_time, location.timezone);
-  const response = await fetch(`${ROXY_API_BASE}/astrology/natal-chart?lang=en`, {
+  const response = await fetchWithTimeout(`${ROXY_API_BASE}/astrology/natal-chart?lang=en`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -87,9 +101,7 @@ const requestNatalChart = async (reading, location, env) => {
       timezone,
       houseSystem: 'placidus'
     })
-  });
-
-  if (!response.ok) throw new Error('The natal-chart service is unavailable.');
+  }, 7000, 'Natal-chart service');
   return response.json();
 };
 
@@ -97,7 +109,7 @@ const createReading = async (reading, natalChart, env) => {
   if (!env.DEEPSEEK_API_KEY) throw new Error('DeepSeek is not configured.');
 
   const chartContext = JSON.stringify(natalChart).slice(0, MAX_CHART_CONTEXT);
-  const response = await fetch('https://api.deepseek.com/chat/completions', {
+  const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -119,9 +131,7 @@ const createReading = async (reading, natalChart, env) => {
         }
       ]
     })
-  });
-
-  if (!response.ok) throw new Error('The interpretation service is unavailable.');
+  }, 10000, 'DeepSeek interpretation');
   const data = await response.json();
   const text = data?.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error('The interpretation service returned no reading.');
@@ -146,9 +156,13 @@ export default {
       const reading = validReading(payload);
       if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, cors);
 
+      console.info('Reading: resolving birthplace.');
       const location = await getBirthLocation(reading.birth_place, env);
+      console.info('Reading: calculating natal chart.');
       const natalChart = await requestNatalChart(reading, location, env);
+      console.info('Reading: generating interpretation.');
       const profile = await createReading(reading, natalChart, env);
+      console.info('Reading: completed.');
       return json({
         message: 'Your astral profile is ready.',
         profile,
