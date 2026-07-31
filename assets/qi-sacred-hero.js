@@ -177,6 +177,41 @@
       }, { passive: true });
     }
 
+    const fetchReading = async (endpoint, payload) => {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 55000);
+
+      try {
+        const requestUrl = new URL(endpoint, window.location.href).toString();
+        const response = await fetch(requestUrl, {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          redirect: 'follow',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        const contentType = response.headers.get('content-type') || '';
+        const result = contentType.includes('application/json')
+          ? await response.json()
+          : { error: (await response.text()).slice(0, 180) };
+
+        if (!response.ok) {
+          const error = new Error(result.error || `Reading service unavailable (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+
+        return result;
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    };
+
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
       status.textContent = '';
@@ -202,17 +237,7 @@
 
       try {
         if (endpoint) {
-          const controller = new AbortController();
-          const timeout = window.setTimeout(() => controller.abort(), 25000);
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-          });
-          window.clearTimeout(timeout);
-          if (!response.ok) throw new Error('Reading service unavailable');
-          const result = await response.json();
+          const result = await fetchReading(endpoint, payload);
           if (result.redirect_url) window.location.assign(result.redirect_url);
           else if (result.profile || result.report) {
             showReadingResult(result);
@@ -224,6 +249,7 @@
           status.textContent = `Thank you, ${payload.name}. Your sacred profile has been received.`;
         }
       } catch (error) {
+        console.error('Qi reading request failed:', error);
         const message = error?.name === 'AbortError'
           ? 'This reading is taking longer than expected. Please try again in a moment.'
           : 'The stars are briefly obscured. Please try again in a moment.';
