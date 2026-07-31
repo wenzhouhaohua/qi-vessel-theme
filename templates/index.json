@@ -1,1 +1,30 @@
-{"sections":{"qi_sacred_hero":{"type":"qi-sacred-astrology-hero","settings":{}}},"order":["qi_sacred_hero"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "qi_sacred_hero": {
+      "type": "qi-sacred-astrology-hero",
+      "settings": {
+        "menu": "",
+        "api_endpoint": "https://qi-reading-api.wenzhouhaohua.workers.dev/reading",
+        "eyebrow": "A PERSONAL ASTROLOGICAL JOURNEY",
+        "heading": "Reveal The Story Written In Your Stars",
+        "text": "<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>",
+        "cta": "BEGIN YOUR READING",
+        "form_heading": "YOUR ASTRAL PROFILE",
+        "form_text": "Enter your exact birth details to begin your personalized astrology reading.",
+        "submit_text": "REVEAL MY DESTINY"
+      }
+    }
+  },
+  "order": [
+    "qi_sacred_hero"
+  ]
+}
