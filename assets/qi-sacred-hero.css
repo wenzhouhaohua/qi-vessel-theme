@@ -352,3 +352,7 @@
 @media(max-width:899px) {
   .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 74px),0) scale(1.02); }
 }
+
+/* V15 luminous guardian: preserve facial warmth and sacred detail through the glass. */
+.qi-sacred__cinematic-scene--desktop { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); }
+@media(max-width:899px) { .qi-sacred__cinematic-scene--mobile { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); } }
