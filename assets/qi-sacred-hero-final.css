@@ -39,6 +39,8 @@
 .qi-sacred__ritual-loading { min-width:250px; padding:24px; text-align:center; }
 .qi-sacred__ritual-wheel { display:grid; width:82px; height:82px; margin:0 auto 20px; place-items:center; border:1px solid rgba(229,207,141,.66); border-radius:50%; color:#f0d98d; font-size:28px; animation:qi-ritual-spin 3.5s linear infinite; }
 .qi-sacred__ritual-loading p { margin:0; color:#f1e2b1; font-size:12px; letter-spacing:.13em; }
+.qi-sacred__ritual-loading.is-error .qi-sacred__ritual-wheel { animation:none; border-color:rgba(231,165,112,.8); color:#f0b176; }
+.qi-sacred__ritual-loading.is-error p { max-width:320px; margin-inline:auto; color:#ffe3c4; letter-spacing:.04em; line-height:1.6; }
 .qi-sacred__reading-kicker { margin:0 0 8px; color:#ddc36e; font-size:10px; font-weight:700; letter-spacing:.18em; }
 .qi-sacred__reading-archetype { margin:0 0 7px; color:#b9c8ee; font-size:12px; font-style:italic; }
 .qi-sacred__reading-result h2 { margin:0; color:#f7e4a9; font:500 clamp(34px,6vw,52px)/1.04 "Cormorant Garamond",serif; }

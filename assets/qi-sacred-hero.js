@@ -30,6 +30,7 @@
     const readingNote = root.querySelector('[data-reading-note]');
 
     const showRitualLoading = () => {
+      ritualLoading?.classList.remove('is-error');
       ritualLoading?.removeAttribute('hidden');
       readingResult?.setAttribute('hidden', '');
     };
@@ -179,11 +180,15 @@
 
       try {
         if (endpoint) {
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 25000);
           const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: controller.signal
           });
+          window.clearTimeout(timeout);
           if (!response.ok) throw new Error('Reading service unavailable');
           const result = await response.json();
           if (result.redirect_url) window.location.assign(result.redirect_url);
@@ -197,7 +202,13 @@
           status.textContent = `Thank you, ${payload.name}. Your sacred profile has been received.`;
         }
       } catch (error) {
-        status.textContent = 'The stars are briefly obscured. Please try again in a moment.';
+        const message = error?.name === 'AbortError'
+          ? 'This reading is taking longer than expected. Please try again in a moment.'
+          : 'The stars are briefly obscured. Please try again in a moment.';
+        status.textContent = message;
+        stage.textContent = message;
+        ritualLoading?.classList.add('is-error');
+        keepDialogOpen = true;
       } finally {
         window.clearInterval(stageTimer);
         if (!keepDialogOpen) dialog?.close();
