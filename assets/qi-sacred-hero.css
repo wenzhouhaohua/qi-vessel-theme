@@ -356,3 +356,26 @@
 /* V15 luminous guardian: preserve facial warmth and sacred detail through the glass. */
 .qi-sacred__cinematic-scene--desktop { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); }
 @media(max-width:899px) { .qi-sacred__cinematic-scene--mobile { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); } }
+
+/* V16: reveal the guardian instead of tinting her behind an opaque card. */
+.qi-sacred__record {
+  background:linear-gradient(145deg,rgba(255,248,230,.12),rgba(104,82,92,.08));
+  border-color:rgba(255,242,215,.72);
+  -webkit-backdrop-filter:blur(3px) saturate(112%);
+  backdrop-filter:blur(3px) saturate(112%);
+  box-shadow:0 20px 54px rgba(53,34,48,.14),inset 0 1px 0 rgba(255,255,255,.34);
+}
+.qi-sacred__input input { background:rgba(56,40,49,.23); border-color:rgba(255,232,190,.48); }
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-face-reveal 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 185px),0) scale(1.01);
+  }
+}
+@keyframes qi-guardian-face-reveal { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 195px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(255,248,230,.10),rgba(104,82,92,.07)); }
+  .qi-sacred__input input { background:rgba(56,40,49,.22); }
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 120px),0) scale(1.02); }
+}
