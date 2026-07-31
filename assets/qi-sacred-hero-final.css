@@ -33,15 +33,19 @@
 .qi-sacred__submit { background:linear-gradient(105deg,#b8a25d,#e2cf8d 49%,#b8a25d); border-color:#e7d69a; color:#10152e; box-shadow:0 10px 26px rgba(161,139,69,.28),inset 0 1px rgba(255,255,255,.58); }
 .qi-sacred__journey { background:linear-gradient(180deg,#10183a 0%,#050814 36%,#020309 100%); }
 .qi-sacred__journey::before { content:''; display:block; height:1px; width:min(1120px,90%); margin:0 auto 54px; background:linear-gradient(90deg,transparent,rgba(216,193,122,.65),transparent); }
-@media (prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { transition:none; } }
+@media (prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop,.qi-sacred__cinematic-scene--mobile,.qi-sacred__record { transition:none; } }
 @media(max-width:899px) {
   .qi-sacred__nav { width:calc(100% - 24px); height:64px; background:rgba(5,10,29,.82); }
   .qi-sacred__stage { width:100%; height:auto; min-height:960px; max-height:none; padding:285px 0 22px; display:block; overflow:hidden; }
   .qi-sacred__cinematic-scene--desktop { display:none; }
-  .qi-sacred__cinematic-scene--mobile { display:block; object-position:center top; transform:none; filter:saturate(1.14) contrast(1.08) brightness(1.02); }
+  .qi-sacred__cinematic-scene--mobile { display:block; object-position:center top; transform:translate3d(var(--qi-mobile-x,0),calc(var(--qi-mobile-y,0) + var(--qi-mobile-shift,0)),0) scale(1.035); transform-origin:center top; filter:saturate(1.14) contrast(1.08) brightness(1.02); transition:transform .65s cubic-bezier(.2,.72,.22,1),filter .65s ease; will-change:transform; }
   .qi-sacred__copy { display:none; }
-  .qi-sacred__record { position:relative; top:auto; left:auto; width:min(88vw,390px); margin:0 auto; transform:none; padding:42px 18px 18px; background:linear-gradient(145deg,rgba(7,18,54,.10),rgba(8,13,35,.06)); }
+  .qi-sacred__record { position:relative; top:auto; left:auto; width:min(88vw,390px); margin:0 auto; transform:translate3d(var(--qi-mobile-panel-x,0),var(--qi-mobile-panel-y,0),0); padding:42px 18px 18px; background:linear-gradient(145deg,rgba(7,18,54,.10),rgba(8,13,35,.06)); transition:transform .55s cubic-bezier(.2,.72,.22,1),border-color .45s ease,box-shadow .45s ease; will-change:transform; }
   .qi-sacred__record:hover { transform:none; }
+  .qi-sacred.is-touch-lit .qi-sacred__cinematic-scene--mobile { filter:saturate(1.22) contrast(1.12) brightness(1.07); }
+  .qi-sacred.is-touch-lit .qi-sacred__record { border-color:rgba(245,222,146,.96); box-shadow:0 20px 48px rgba(0,0,0,.26),0 0 34px rgba(213,181,83,.18),inset 0 1px 0 rgba(255,255,255,.42); }
+  .qi-sacred.is-touch-lit .qi-sacred__record-cap { box-shadow:0 0 18px rgba(226,196,105,.38); }
+  .qi-sacred__record:focus-within { border-color:rgba(245,222,146,.96); box-shadow:0 20px 48px rgba(0,0,0,.28),0 0 30px rgba(213,181,83,.16),inset 0 1px 0 rgba(255,255,255,.38); }
   .qi-sacred__input input { height:46px; font-size:16px; }
   .qi-sacred__submit { height:52px; }
   .qi-sacred__journey::before { margin-bottom:38px; }

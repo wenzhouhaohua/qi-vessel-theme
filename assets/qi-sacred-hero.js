@@ -43,19 +43,48 @@
     }
 
     if (!window.matchMedia('(pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let touchFrame;
+      let touchReset;
+      const setMobileDepth = (clientX, clientY) => {
+        const rect = root.getBoundingClientRect();
+        const x = Math.max(-1, Math.min(1, ((clientX - rect.left) / rect.width - .5) * 2));
+        const y = Math.max(-1, Math.min(1, ((clientY - rect.top) / rect.height - .5) * 2));
+        root.style.setProperty('--qi-mobile-x', `${x * 10}px`);
+        root.style.setProperty('--qi-mobile-y', `${y * 7}px`);
+        root.style.setProperty('--qi-mobile-panel-x', `${x * -3}px`);
+        root.style.setProperty('--qi-mobile-panel-y', `${y * -2}px`);
+      };
+
       const updateMobileMotion = () => {
         const rect = root.getBoundingClientRect();
         const middle = rect.top + rect.height / 2;
         const viewportMiddle = window.innerHeight / 2;
         const progress = Math.max(-1, Math.min(1, (middle - viewportMiddle) / window.innerHeight));
-        root.style.setProperty('--qi-mobile-shift', `${progress * -28}px`);
+        root.style.setProperty('--qi-mobile-shift', `${progress * -18}px`);
       };
 
       window.addEventListener('scroll', updateMobileMotion, { passive: true });
       updateMobileMotion();
-      root.addEventListener('pointerdown', () => {
+      root.addEventListener('pointerdown', (event) => {
+        setMobileDepth(event.clientX, event.clientY);
         root.classList.add('is-touch-lit');
-        window.setTimeout(() => root.classList.remove('is-touch-lit'), 900);
+        window.clearTimeout(touchReset);
+        touchReset = window.setTimeout(() => root.classList.remove('is-touch-lit'), 1100);
+      }, { passive: true });
+      root.addEventListener('pointermove', (event) => {
+        if (event.pointerType !== 'touch') return;
+        window.cancelAnimationFrame(touchFrame);
+        touchFrame = window.requestAnimationFrame(() => setMobileDepth(event.clientX, event.clientY));
+      }, { passive: true });
+      root.addEventListener('pointerup', () => {
+        window.clearTimeout(touchReset);
+        touchReset = window.setTimeout(() => {
+          root.classList.remove('is-touch-lit');
+          root.style.setProperty('--qi-mobile-x', '0px');
+          root.style.setProperty('--qi-mobile-y', '0px');
+          root.style.setProperty('--qi-mobile-panel-x', '0px');
+          root.style.setProperty('--qi-mobile-panel-y', '0px');
+        }, 520);
       }, { passive: true });
     }
 
