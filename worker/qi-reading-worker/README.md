@@ -9,7 +9,7 @@ Secure server-side bridge for the Shopify astrology form:
 1. Create or sign in to a Cloudflare account.
 2. Install Node.js LTS and run `npm install` in this folder.
 3. Run `npx wrangler login`.
-4. Confirm the exact RoxyAPI natal-chart endpoint, authentication header, and request/response schema. Update `requestNatalChart` in `src/index.js` if its documented schema differs.
+4. The Worker uses RoxyAPI's documented `GET /api/v2/location/search` and `POST /api/v2/astrology/natal-chart` endpoints. It converts the entered city into coordinates and calculates the historical UTC offset from RoxyAPI's IANA timezone before requesting the natal chart.
 
 ## Secrets and configuration
 
@@ -18,7 +18,6 @@ Never put a provider key in Shopify or Git. From this folder run:
 ```powershell
 npx wrangler secret put ROXY_API_KEY
 npx wrangler secret put DEEPSEEK_API_KEY
-npx wrangler secret put ROXY_API_URL
 npx wrangler secret put ALLOWED_ORIGIN
 ```
 

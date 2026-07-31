@@ -7,6 +7,5 @@ compatibility_date = "2026-07-31"
 # DEEPSEEK_API_KEY
 #
 # Set these non-secret variables in the Cloudflare dashboard or with `wrangler secret put`:
-# ROXY_API_URL  (the exact RoxyAPI natal-chart endpoint)
 # ALLOWED_ORIGIN (https://qivessel.com)
 # DEEPSEEK_MODEL (optional; defaults to deepseek-chat)

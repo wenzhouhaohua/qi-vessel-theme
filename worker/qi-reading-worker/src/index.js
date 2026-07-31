@@ -1,5 +1,6 @@
 const DEFAULT_ORIGIN = 'https://qivessel.com';
 const MAX_CHART_CONTEXT = 18000;
+const ROXY_API_BASE = 'https://roxyapi.com/api/v2';
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -36,23 +37,55 @@ const validReading = (payload) => {
   return reading;
 };
 
-// RoxyAPI's endpoint and request schema must be confirmed against your account's documentation.
-// The Worker intentionally keeps this adapter in one place so provider changes never touch Shopify code.
-const requestNatalChart = async (reading, env) => {
-  if (!env.ROXY_API_URL || !env.ROXY_API_KEY) {
-    throw new Error('RoxyAPI is not configured.');
-  }
+const getBirthLocation = async (birthPlace, env) => {
+  if (!env.ROXY_API_KEY) throw new Error('RoxyAPI is not configured.');
+  const url = new URL(`${ROXY_API_BASE}/location/search`);
+  url.searchParams.set('q', birthPlace);
+  url.searchParams.set('limit', '1');
 
-  const response = await fetch(env.ROXY_API_URL, {
+  const response = await fetch(url, {
+    headers: { 'X-API-Key': env.ROXY_API_KEY }
+  });
+  if (!response.ok) throw new Error('The birthplace lookup service is unavailable.');
+
+  const data = await response.json();
+  const place = data?.cities?.[0];
+  const latitude = Number(place?.latitude);
+  const longitude = Number(place?.longitude);
+  if (!place || !Number.isFinite(latitude) || !Number.isFinite(longitude) || !place.timezone) {
+    throw new Error('Birthplace not found.');
+  }
+  return { ...place, latitude, longitude };
+};
+
+const utcOffsetAtBirth = (date, time, timeZone) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute] = time.split(':').map(Number);
+  const localAsUtc = Date.UTC(year, month - 1, day, hour, minute);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date(localAsUtc));
+  const value = (kind) => Number(parts.find((part) => part.type === kind)?.value);
+  const zonedAsUtc = Date.UTC(value('year'), value('month') - 1, value('day'), value('hour'), value('minute'));
+  return (zonedAsUtc - localAsUtc) / 3600000;
+};
+
+const requestNatalChart = async (reading, location, env) => {
+  const timezone = utcOffsetAtBirth(reading.birth_date, reading.birth_time, location.timezone);
+  const response = await fetch(`${ROXY_API_BASE}/astrology/natal-chart?lang=en`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.ROXY_API_KEY}`
+      'X-API-Key': env.ROXY_API_KEY
     },
     body: JSON.stringify({
-      birth_date: reading.birth_date,
-      birth_time: reading.birth_time,
-      birth_place: reading.birth_place
+      date: reading.birth_date,
+      time: `${reading.birth_time}:00`,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      timezone,
+      houseSystem: 'placidus'
     })
   });
 
@@ -108,9 +141,14 @@ export default {
       const reading = validReading(payload);
       if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, cors);
 
-      const natalChart = await requestNatalChart(reading, env);
+      const location = await getBirthLocation(reading.birth_place, env);
+      const natalChart = await requestNatalChart(reading, location, env);
       const report = await createReading(reading, natalChart, env);
-      return json({ message: 'Your astral profile is ready.', report }, 200, cors);
+      return json({
+        message: 'Your astral profile is ready.',
+        report,
+        location: `${location.city}${location.country ? `, ${location.country}` : ''}`
+      }, 200, cors);
     } catch (error) {
       console.error(error instanceof Error ? error.message : 'Unknown reading error');
       return json({ error: 'The stars are briefly obscured. Please try again in a moment.' }, 502, cors);
