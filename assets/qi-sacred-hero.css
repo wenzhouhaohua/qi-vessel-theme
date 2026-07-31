@@ -249,3 +249,52 @@
   .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 12px),0) scale(1.02); }
   .qi-sacred__stage { min-height:max(calc(100svh - 64px), 820px); padding-top:128px; padding-bottom:18px; }
 }
+
+/* V11 conversion-first palette: warm light glass, with the form clearly leading the scene. */
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.72) contrast(.95) brightness(.98) sepia(.08);
+}
+.qi-sacred::before {
+  background:
+    linear-gradient(90deg, rgba(53,39,54,.18) 0%, rgba(255,244,220,.03) 34%, rgba(255,244,220,.02) 70%, rgba(53,39,54,.13) 100%),
+    linear-gradient(180deg, rgba(255,245,224,.08), transparent 31%, rgba(76,54,70,.13) 100%);
+}
+.qi-sacred__nebula--one { background:rgba(252,228,189,.20); opacity:.30; }
+.qi-sacred__nebula--two { background:rgba(218,174,113,.16); opacity:.23; }
+.qi-sacred__copy { opacity:.76; }
+.qi-sacred__copy h1 { text-shadow:0 8px 32px rgba(70,50,65,.28); }
+.qi-sacred__record {
+  width:min(378px,26vw);
+  background:linear-gradient(145deg,rgba(255,249,233,.22),rgba(221,194,159,.13));
+  border-color:rgba(255,246,223,.76);
+  -webkit-backdrop-filter:blur(10px) saturate(122%);
+  backdrop-filter:blur(10px) saturate(122%);
+  box-shadow:0 24px 62px rgba(74,50,62,.20),0 0 56px rgba(247,210,148,.18),inset 0 1px 0 rgba(255,255,255,.46);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#fff0cc; text-shadow:0 2px 12px rgba(76,48,48,.30); }
+.qi-sacred__input input {
+  background:rgba(67,48,62,.34);
+  border-color:rgba(255,235,197,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.qi-sacred__input input::placeholder { color:rgba(255,247,227,.68); }
+.qi-sacred__submit {
+  background:linear-gradient(100deg,#f5d59d,#e7a941);
+  color:#2f1b19;
+  box-shadow:0 12px 28px rgba(187,125,44,.28),inset 0 1px 0 rgba(255,255,255,.68);
+}
+@media(min-width:900px) {
+  .qi-sacred__record { transform:translate(-50%,-43%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-44%); }
+}
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { filter:saturate(.72) contrast(.95) brightness(.98) sepia(.08); }
+  .qi-sacred__copy { opacity:.72; }
+  .qi-sacred__record {
+    width:min(88vw,390px);
+    background:linear-gradient(145deg,rgba(255,249,233,.20),rgba(221,194,159,.12));
+    border-color:rgba(255,246,223,.72);
+    box-shadow:0 22px 58px rgba(74,50,62,.18),0 0 46px rgba(247,210,148,.16),inset 0 1px 0 rgba(255,255,255,.42);
+  }
+  .qi-sacred__input input { background:rgba(67,48,62,.32); }
+}
