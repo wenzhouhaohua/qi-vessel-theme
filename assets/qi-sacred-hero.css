@@ -379,3 +379,21 @@
   .qi-sacred__input input { background:rgba(56,40,49,.22); }
   .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 120px),0) scale(1.02); }
 }
+
+/* V17 clarity pass: preserve the luminous guardian while removing the washed-out first impression. */
+.qi-sacred__cinematic-scene--desktop { filter:saturate(.88) contrast(1.17) brightness(.76) sepia(.02); }
+.qi-sacred__cosmos::after {
+  content:'';
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(37,25,34,.24),transparent 28%,transparent 72%,rgba(37,25,34,.18)),
+    linear-gradient(180deg,rgba(38,26,35,.10),transparent 27%,rgba(35,23,31,.32) 100%);
+  mix-blend-mode:multiply;
+}
+.qi-sacred__stars { opacity:.29; }
+.qi-sacred__record { box-shadow:0 20px 54px rgba(45,28,38,.18),inset 0 1px 0 rgba(255,255,255,.34); }
+@media(max-width:899px) { .qi-sacred__cinematic-scene--mobile { filter:saturate(.88) contrast(1.17) brightness(.76) sepia(.02); } }
