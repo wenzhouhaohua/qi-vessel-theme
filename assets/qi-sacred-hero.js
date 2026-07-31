@@ -35,10 +35,27 @@
         const rect = root.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width - .5);
         const y = ((event.clientY - rect.top) / rect.height - .5);
-        root.style.setProperty('--qi-x', `${x * 10}px`);
-        root.style.setProperty('--qi-y', `${y * 7}px`);
-        root.style.setProperty('--qi-oracle-x', `${x * 6}px`);
-        root.style.setProperty('--qi-oracle-y', `${y * 4}px`);
+        root.style.setProperty('--qi-x', `${x * 16}px`);
+        root.style.setProperty('--qi-y', `${y * 11}px`);
+        root.style.setProperty('--qi-oracle-x', `${x * 12}px`);
+        root.style.setProperty('--qi-oracle-y', `${y * 8}px`);
+      }, { passive: true });
+    }
+
+    if (!window.matchMedia('(pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const updateMobileMotion = () => {
+        const rect = root.getBoundingClientRect();
+        const middle = rect.top + rect.height / 2;
+        const viewportMiddle = window.innerHeight / 2;
+        const progress = Math.max(-1, Math.min(1, (middle - viewportMiddle) / window.innerHeight));
+        root.style.setProperty('--qi-mobile-shift', `${progress * -28}px`);
+      };
+
+      window.addEventListener('scroll', updateMobileMotion, { passive: true });
+      updateMobileMotion();
+      root.addEventListener('pointerdown', () => {
+        root.classList.add('is-touch-lit');
+        window.setTimeout(() => root.classList.remove('is-touch-lit'), 900);
       }, { passive: true });
     }
 
