@@ -298,3 +298,42 @@
   }
   .qi-sacred__input input { background:rgba(67,48,62,.32); }
 }
+
+/* V12 final atmosphere: crisp warm astral architecture, without fog or washed-out whites. */
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06);
+}
+.qi-sacred__nebula,
+.qi-sacred__light-column,
+.qi-sacred__dust { display:none; }
+.qi-sacred::before {
+  background:
+    linear-gradient(90deg,rgba(39,29,38,.26),rgba(82,60,66,.07) 34%,rgba(82,60,66,.04) 68%,rgba(39,29,38,.20)),
+    linear-gradient(180deg,rgba(40,28,38,.16),transparent 34%,rgba(31,23,32,.26));
+}
+.qi-sacred__nav {
+  background:linear-gradient(90deg,rgba(42,29,33,.60),rgba(59,40,41,.42),rgba(42,29,33,.60));
+  border-bottom-color:rgba(225,177,102,.28);
+  -webkit-backdrop-filter:blur(9px) saturate(112%);
+  backdrop-filter:blur(9px) saturate(112%);
+}
+.qi-sacred__copy { opacity:1; }
+.qi-sacred__copy h1 { color:#fff5e6; text-shadow:0 8px 30px rgba(34,23,34,.50); }
+.qi-sacred__intro { color:#f4e7d6; text-shadow:0 2px 12px rgba(34,23,34,.45); }
+.qi-sacred__benefits { color:#f7ead8; border-top-color:rgba(227,180,108,.38); }
+.qi-sacred__record {
+  background:linear-gradient(145deg,rgba(74,55,48,.30),rgba(45,34,40,.26));
+  border-color:rgba(248,224,181,.68);
+  -webkit-backdrop-filter:blur(8px) saturate(118%);
+  backdrop-filter:blur(8px) saturate(118%);
+  box-shadow:0 24px 62px rgba(31,21,28,.30),0 0 42px rgba(207,152,77,.13),inset 0 1px 0 rgba(255,255,255,.30);
+}
+.qi-sacred__input input {
+  background:rgba(48,35,42,.38);
+  border-color:rgba(246,217,171,.50);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#ffe9bf; }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06); }
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(74,55,48,.29),rgba(45,34,40,.25)); }
+}
