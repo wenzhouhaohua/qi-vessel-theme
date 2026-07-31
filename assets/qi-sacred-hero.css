@@ -233,3 +233,19 @@
   }
 }
 @keyframes qi-guardian-float { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 98px),0) scale(1.045); } }
+
+/* V10: reference-faithful face and a calmer, correctly scaled stage. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-float-v10 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 18px),0) scale(1.01);
+  }
+  .qi-sacred__record { transform:translate(-50%,-43%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-44%); }
+}
+@keyframes qi-guardian-float-v10 { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 28px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 12px),0) scale(1.02); }
+  .qi-sacred__stage { min-height:max(calc(100svh - 64px), 820px); padding-top:128px; padding-bottom:18px; }
+}
