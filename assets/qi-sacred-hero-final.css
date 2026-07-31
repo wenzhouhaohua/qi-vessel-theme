@@ -40,9 +40,22 @@
 .qi-sacred__ritual-wheel { display:grid; width:82px; height:82px; margin:0 auto 20px; place-items:center; border:1px solid rgba(229,207,141,.66); border-radius:50%; color:#f0d98d; font-size:28px; animation:qi-ritual-spin 3.5s linear infinite; }
 .qi-sacred__ritual-loading p { margin:0; color:#f1e2b1; font-size:12px; letter-spacing:.13em; }
 .qi-sacred__reading-kicker { margin:0 0 8px; color:#ddc36e; font-size:10px; font-weight:700; letter-spacing:.18em; }
+.qi-sacred__reading-archetype { margin:0 0 7px; color:#b9c8ee; font-size:12px; font-style:italic; }
 .qi-sacred__reading-result h2 { margin:0; color:#f7e4a9; font:500 clamp(34px,6vw,52px)/1.04 "Cormorant Garamond",serif; }
 .qi-sacred__reading-location { margin:10px 0 22px; color:#babfd1; font-size:12px; }
-.qi-sacred__reading-report { white-space:pre-wrap; color:#f0edf0; font-size:15px; line-height:1.75; }
+.qi-sacred__reading-opening { margin:0 0 24px; color:#f5f1e8; font:500 21px/1.45 "Cormorant Garamond",serif; }
+.qi-sacred__big-three { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:0 0 26px; }
+.qi-sacred__big-three article { min-height:132px; padding:15px 12px; border:1px solid rgba(224,204,139,.3); border-radius:10px; background:rgba(141,163,228,.07); }
+.qi-sacred__big-three small { display:block; color:#ddc36e; font-size:9px; font-weight:700; letter-spacing:.13em; }
+.qi-sacred__big-three strong { display:block; margin:8px 0 6px; color:#f6e2a3; font:500 24px/1 "Cormorant Garamond",serif; }
+.qi-sacred__big-three p,.qi-sacred__reading-section>p,.qi-sacred__bracelet-card>p { margin:0; color:#e7e8f0; font-size:13px; line-height:1.62; }
+.qi-sacred__reading-section { padding:21px 0; border-top:1px solid rgba(224,204,139,.23); }
+.qi-sacred__reading-section--ritual { padding:20px; border:1px solid rgba(224,204,139,.34); border-radius:12px; background:linear-gradient(135deg,rgba(186,158,85,.16),rgba(88,114,184,.12)); }
+.qi-sacred__reading-section-label { margin:0 0 8px; color:#ddc36e; font-size:9px; font-weight:700; letter-spacing:.17em; }
+.qi-sacred__reading-section h3,.qi-sacred__bracelet-card h3 { margin:0 0 9px; color:#f6e2a3; font:500 27px/1.08 "Cormorant Garamond",serif; }
+.qi-sacred__bracelet-card { margin-top:24px; padding:24px; border:1px solid rgba(229,207,141,.55); border-radius:14px; background:radial-gradient(circle at 16% 0,rgba(225,199,115,.17),transparent 45%),rgba(5,13,38,.45); }
+.qi-sacred__crystal-chips { display:flex; flex-wrap:wrap; gap:7px; margin:13px 0; }
+.qi-sacred__crystal-chips span { padding:6px 9px; border:1px solid rgba(225,201,132,.45); border-radius:999px; color:#f2dea0; font-size:11px; }
 .qi-sacred__reading-cta { display:flex; align-items:center; justify-content:center; gap:8px; min-height:54px; margin-top:30px; border:1px solid #e5cf8d; border-radius:6px; background:linear-gradient(105deg,#b8a25d,#e2cf8d 49%,#b8a25d); color:#10152e; font-size:11px; font-weight:700; letter-spacing:.12em; text-decoration:none; }
 .qi-sacred__reading-note { margin:14px 0 0; color:#aeb2c4; font-size:11px; line-height:1.5; text-align:center; }
 @keyframes qi-ritual-spin { to { transform:rotate(360deg); } }
@@ -63,7 +76,8 @@
   .qi-sacred__submit { height:52px; }
   .qi-sacred__journey::before { margin-bottom:38px; }
   .qi-sacred__ritual { width:calc(100% - 24px); padding:38px 20px; }
-  .qi-sacred__reading-report { font-size:14px; line-height:1.7; }
+  .qi-sacred__big-three { grid-template-columns:1fr; }
+  .qi-sacred__big-three article { min-height:0; }
 }
 @media(max-width:520px) {
   .qi-sacred__stage { min-height:900px; padding-top:255px; }

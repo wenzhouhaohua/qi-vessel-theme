@@ -132,11 +132,29 @@
     </div>
     <article class="qi-sacred__reading-result" data-reading-result hidden>
       <p class="qi-sacred__reading-kicker">YOUR CELESTIAL READING</p>
-      <h2>Your Astral Profile</h2>
+      <p class="qi-sacred__reading-archetype" data-reading-archetype></p>
+      <h2 data-reading-title>Your Astral Profile</h2>
       <p class="qi-sacred__reading-location" data-reading-location></p>
-      <div class="qi-sacred__reading-report" data-reading-report></div>
-      <a class="qi-sacred__reading-cta" href="{{ routes.collections_url }}">EXPLORE YOUR ALIGNED BRACELETS <span>＋</span></a>
-      <p class="qi-sacred__reading-note">For reflection and personal inspiration. Your path is always your own.</p>
+      <p class="qi-sacred__reading-opening" data-reading-opening></p>
+      <section class="qi-sacred__big-three" aria-label="Your Big Three" data-reading-big-three></section>
+      <section class="qi-sacred__reading-section">
+        <p class="qi-sacred__reading-section-label">YOUR CURRENT PATTERN</p>
+        <h3 data-reading-attention-title>What Wants Your Attention</h3>
+        <p data-reading-attention-body></p>
+      </section>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--ritual">
+        <p class="qi-sacred__reading-section-label">YOUR RITUAL INTENTION</p>
+        <h3 data-reading-ritual-intention></h3>
+        <p data-reading-ritual-practice></p>
+      </section>
+      <section class="qi-sacred__bracelet-card">
+        <p class="qi-sacred__reading-section-label">YOUR ALIGNED BRACELET</p>
+        <h3 data-reading-bracelet-title></h3>
+        <div class="qi-sacred__crystal-chips" data-reading-crystals></div>
+        <p data-reading-bracelet-reason></p>
+        <a class="qi-sacred__reading-cta" href="{{ routes.collections_url }}" data-reading-cta>EXPLORE YOUR ALIGNED BRACELETS <span>＋</span></a>
+      </section>
+      <p class="qi-sacred__reading-note" data-reading-note>For reflection and personal inspiration. Your path is always your own.</p>
     </article>
   </dialog>
 </section>

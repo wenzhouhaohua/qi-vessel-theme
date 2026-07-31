@@ -105,16 +105,17 @@ const createReading = async (reading, natalChart, env) => {
     },
     body: JSON.stringify({
       model: env.DEEPSEEK_MODEL || 'deepseek-chat',
-      temperature: 0.72,
-      max_tokens: 1400,
+      temperature: 0.7,
+      max_tokens: 1200,
+      response_format: { type: 'json_object' },
       messages: [
         {
           role: 'system',
-          content: 'You write ethical, entertainment-focused Western astrology readings in polished American English. Do not claim certainty, diagnose, promise outcomes, or give medical, legal, or financial advice. Use the natal-chart data supplied by the user. End with a gentle crystal bracelet recommendation framed as a symbolic intention, not a guarantee.'
+          content: 'You write ethical, entertainment-focused Western astrology readings in polished American English. Do not claim certainty, diagnose, promise outcomes, or give medical, legal, or financial advice. Use only natal-chart data supplied by the user. Return valid JSON only, with no Markdown and no code fences.'
         },
         {
           role: 'user',
-          content: `Create a concise, warm astrology reading for ${reading.name}. Use these headings: Your Celestial Signature, What Wants Your Attention, Your Ritual Intention, Crystal Bracelet Guidance. Keep it under 850 words.\n\nBirth data: ${JSON.stringify(reading)}\n\nNatal-chart provider response: ${chartContext}`
+          content: `Create a concise, warm personalized reading for ${reading.name}. Return exactly this JSON shape:\n{\n  "archetype":"short poetic archetype, max 6 words",\n  "title":"a personal report title, max 8 words",\n  "opening":"a resonant 2-sentence insight, max 55 words",\n  "big_three":[\n    {"label":"Sun","sign":"sign name","meaning":"one practical sentence"},\n    {"label":"Moon","sign":"sign name","meaning":"one practical sentence"},\n    {"label":"Rising","sign":"sign name","meaning":"one practical sentence"}\n  ],\n  "attention":{"title":"short current-pattern title","body":"2 concise sentences, max 65 words"},\n  "ritual":{"intention":"short daily intention","practice":"one simple reflective practice, max 35 words"},\n  "bracelet":{"title":"A symbolic bracelet intention","crystals":["crystal 1","crystal 2","crystal 3"],"reason":"2 concise sentences explaining symbolic resonance, never a promise","cta_label":"EXPLORE YOUR ALIGNED BRACELETS"},\n  "disclaimer":"For reflection and personal inspiration. Your path is always your own."\n}\n\nBirth data: ${JSON.stringify(reading)}\n\nNatal-chart provider response: ${chartContext}`
         }
       ]
     })
@@ -122,9 +123,13 @@ const createReading = async (reading, natalChart, env) => {
 
   if (!response.ok) throw new Error('The interpretation service is unavailable.');
   const data = await response.json();
-  const report = data?.choices?.[0]?.message?.content?.trim();
-  if (!report) throw new Error('The interpretation service returned no reading.');
-  return report;
+  const text = data?.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new Error('The interpretation service returned no reading.');
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error('The interpretation service returned an invalid reading.');
+  }
 };
 
 export default {
@@ -143,10 +148,10 @@ export default {
 
       const location = await getBirthLocation(reading.birth_place, env);
       const natalChart = await requestNatalChart(reading, location, env);
-      const report = await createReading(reading, natalChart, env);
+      const profile = await createReading(reading, natalChart, env);
       return json({
         message: 'Your astral profile is ready.',
-        report,
+        profile,
         location: `${location.city}${location.country ? `, ${location.country}` : ''}`
       }, 200, cors);
     } catch (error) {

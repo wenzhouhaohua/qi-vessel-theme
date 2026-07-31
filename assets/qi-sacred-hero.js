@@ -14,8 +14,20 @@
     const closeDialog = root.querySelector('[data-close-ritual]');
     const ritualLoading = root.querySelector('[data-ritual-loading]');
     const readingResult = root.querySelector('[data-reading-result]');
-    const readingReport = root.querySelector('[data-reading-report]');
     const readingLocation = root.querySelector('[data-reading-location]');
+    const readingArchetype = root.querySelector('[data-reading-archetype]');
+    const readingTitle = root.querySelector('[data-reading-title]');
+    const readingOpening = root.querySelector('[data-reading-opening]');
+    const readingBigThree = root.querySelector('[data-reading-big-three]');
+    const attentionTitle = root.querySelector('[data-reading-attention-title]');
+    const attentionBody = root.querySelector('[data-reading-attention-body]');
+    const ritualIntention = root.querySelector('[data-reading-ritual-intention]');
+    const ritualPractice = root.querySelector('[data-reading-ritual-practice]');
+    const braceletTitle = root.querySelector('[data-reading-bracelet-title]');
+    const braceletReason = root.querySelector('[data-reading-bracelet-reason]');
+    const readingCrystals = root.querySelector('[data-reading-crystals]');
+    const readingCta = root.querySelector('[data-reading-cta]');
+    const readingNote = root.querySelector('[data-reading-note]');
 
     const showRitualLoading = () => {
       ritualLoading?.removeAttribute('hidden');
@@ -23,9 +35,47 @@
     };
 
     const showReadingResult = (result) => {
+      const profile = result.profile || {};
       ritualLoading?.setAttribute('hidden', '');
-      if (readingReport) readingReport.textContent = result.report || result.message || '';
+      if (readingArchetype) readingArchetype.textContent = profile.archetype || 'YOUR CELESTIAL SIGNATURE';
+      if (readingTitle) readingTitle.textContent = profile.title || 'Your Astral Profile';
       if (readingLocation) readingLocation.textContent = result.location ? `Birthplace resolved as ${result.location}` : '';
+      if (readingOpening) readingOpening.textContent = profile.opening || result.report || result.message || '';
+      if (attentionTitle) attentionTitle.textContent = profile.attention?.title || 'What Wants Your Attention';
+      if (attentionBody) attentionBody.textContent = profile.attention?.body || '';
+      if (ritualIntention) ritualIntention.textContent = profile.ritual?.intention || 'Return to your own rhythm.';
+      if (ritualPractice) ritualPractice.textContent = profile.ritual?.practice || '';
+      if (braceletTitle) braceletTitle.textContent = profile.bracelet?.title || 'Your Aligned Bracelet';
+      if (braceletReason) braceletReason.textContent = profile.bracelet?.reason || '';
+      if (readingNote) readingNote.textContent = profile.disclaimer || 'For reflection and personal inspiration. Your path is always your own.';
+      if (readingCta) {
+        const label = document.createTextNode(profile.bracelet?.cta_label || 'EXPLORE YOUR ALIGNED BRACELETS');
+        const icon = document.createElement('span');
+        icon.textContent = '＋';
+        readingCta.replaceChildren(label, icon);
+      }
+      if (readingBigThree) {
+        readingBigThree.replaceChildren();
+        (profile.big_three || []).slice(0, 3).forEach((item) => {
+          const card = document.createElement('article');
+          const label = document.createElement('small');
+          const sign = document.createElement('strong');
+          const meaning = document.createElement('p');
+          label.textContent = item.label || 'Celestial key';
+          sign.textContent = item.sign || '—';
+          meaning.textContent = item.meaning || '';
+          card.append(label, sign, meaning);
+          readingBigThree.append(card);
+        });
+      }
+      if (readingCrystals) {
+        readingCrystals.replaceChildren();
+        (profile.bracelet?.crystals || []).slice(0, 3).forEach((crystal) => {
+          const chip = document.createElement('span');
+          chip.textContent = crystal;
+          readingCrystals.append(chip);
+        });
+      }
       readingResult?.removeAttribute('hidden');
     };
 
@@ -137,7 +187,7 @@
           if (!response.ok) throw new Error('Reading service unavailable');
           const result = await response.json();
           if (result.redirect_url) window.location.assign(result.redirect_url);
-          else if (result.report) {
+          else if (result.profile || result.report) {
             showReadingResult(result);
             keepDialogOpen = true;
             status.textContent = 'Your astral profile is ready.';
