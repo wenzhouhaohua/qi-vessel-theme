@@ -1,6 +1,7 @@
 const DEFAULT_ORIGIN = 'https://qivessel.com';
 const MAX_CHART_CONTEXT = 18000;
 const ROXY_API_BASE = 'https://roxyapi.com/api/v2';
+const SHOPIFY_PROXY_MAX_AGE_SECONDS = 5 * 60;
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -33,6 +34,58 @@ const corsHeaders = (request, env) => {
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin'
   };
+};
+
+const encoder = new TextEncoder();
+
+const toHex = (buffer) => Array.from(new Uint8Array(buffer))
+  .map((value) => value.toString(16).padStart(2, '0'))
+  .join('');
+
+const secureEqual = (left, right) => {
+  if (typeof left !== 'string' || typeof right !== 'string' || left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  return mismatch === 0;
+};
+
+const shopifyProxySignatureIsValid = async (request, env) => {
+  if (!env.SHOPIFY_API_SECRET) return false;
+
+  const url = new URL(request.url);
+  const signature = url.searchParams.get('signature');
+  const timestamp = Number(url.searchParams.get('timestamp'));
+  const shop = url.searchParams.get('shop');
+
+  if (!signature || !Number.isFinite(timestamp) || !shop) return false;
+  if (Math.abs(Date.now() / 1000 - timestamp) > SHOPIFY_PROXY_MAX_AGE_SECONDS) return false;
+  if (env.SHOPIFY_SHOP_DOMAIN && shop !== env.SHOPIFY_SHOP_DOMAIN) return false;
+
+  const grouped = new Map();
+  for (const [key, value] of url.searchParams.entries()) {
+    if (key === 'signature') continue;
+    grouped.set(key, [...(grouped.get(key) || []), value]);
+  }
+  const message = Array.from(grouped.entries())
+    .map(([key, values]) => `${key}=${values.join(',')}`)
+    .sort()
+    .join('');
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(env.SHOPIFY_API_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const digest = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
+  return secureEqual(toHex(digest), signature);
+};
+
+const requestHeaders = async (request, env) => {
+  const cors = corsHeaders(request, env);
+  if (cors) return cors;
+  if (await shopifyProxySignatureIsValid(request, env)) return {};
+  return null;
 };
 
 const cleanText = (value, maxLength) => typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
@@ -144,17 +197,20 @@ const createReading = async (reading, natalChart, env) => {
 
 export default {
   async fetch(request, env) {
-    const cors = corsHeaders(request, env);
-    if (!cors) return json({ error: 'Origin not allowed.' }, 403);
-    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    const headers = await requestHeaders(request, env);
+    if (!headers) return json({ error: 'Unauthorized request.' }, 403);
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+    if (request.method === 'GET' && new URL(request.url).pathname === '/reading') {
+      return json({ status: 'Qi Reading Proxy is ready.' }, 200, headers);
+    }
     if (request.method !== 'POST' || new URL(request.url).pathname !== '/reading') {
-      return json({ error: 'Not found.' }, 404, cors);
+      return json({ error: 'Not found.' }, 404, headers);
     }
 
     try {
       const payload = await request.json();
       const reading = validReading(payload);
-      if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, cors);
+      if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, headers);
 
       console.info('Reading: resolving birthplace.');
       const location = await getBirthLocation(reading.birth_place, env);
@@ -167,10 +223,10 @@ export default {
         message: 'Your astral profile is ready.',
         profile,
         location: `${location.city}${location.country ? `, ${location.country}` : ''}`
-      }, 200, cors);
+      }, 200, headers);
     } catch (error) {
       console.error(error instanceof Error ? error.message : 'Unknown reading error');
-      return json({ error: 'The stars are briefly obscured. Please try again in a moment.' }, 502, cors);
+      return json({ error: 'The stars are briefly obscured. Please try again in a moment.' }, 502, headers);
     }
   }
 };
