@@ -218,3 +218,18 @@
   .qi-sacred__input input { background:rgba(28,24,43,.28); }
 }
 @media(max-width:520px) { .qi-sacred__cinematic-scene--mobile { object-position:center top; } .qi-sacred__record { background:linear-gradient(145deg,rgba(42,34,59,.38),rgba(21,19,39,.43)); } }
+
+/* V9 composition correction: never place the guardian's face beneath the form. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 88px),0) scale(1.025);
+  }
+  .qi-sacred__record { transform:translate(-50%,-39%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-40%); }
+}
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile {
+    transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 52px),0) scale(1.055);
+  }
+}
+@keyframes qi-guardian-float { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 98px),0) scale(1.045); } }
