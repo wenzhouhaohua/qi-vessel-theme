@@ -8,19 +8,73 @@ const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(b
   headers: { 'Content-Type': 'application/json; charset=UTF-8', ...headers }
 });
 
-const fetchWithTimeout = async (url, options, timeoutMs, label) => {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    if (!response.ok) throw new Error(`${label} returned ${response.status}.`);
-    return response;
-  } catch (error) {
-    if (error?.name === 'AbortError') throw new Error(`${label} timed out.`);
-    throw error;
-  } finally {
-    clearTimeout(timeout);
+const wait = (milliseconds) =>
+  new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const errorMessage = (error) =>
+  error instanceof Error ? error.message : String(error || 'Unknown error');
+
+const fetchJsonWithRetry = async (
+  url,
+  options,
+  { timeoutMs, attempts = 1, label = 'Upstream service' }
+) => {
+  let lastError;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      const text = await response.text();
+      let data = null;
+
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          const invalidJsonError = new Error(`${label} returned invalid JSON.`);
+          invalidJsonError.retryable = true;
+          throw invalidJsonError;
+        }
+      }
+
+      if (!response.ok) {
+        const detail = data?.error || data?.message || text.slice(0, 180);
+        const serviceError = new Error(
+          `${label} returned ${response.status}${detail ? `: ${detail}` : ''}`
+        );
+        serviceError.retryable =
+          response.status === 408 || response.status === 429 || response.status >= 500;
+        throw serviceError;
+      }
+
+      if (!data) {
+        const emptyResponseError = new Error(`${label} returned an empty response.`);
+        emptyResponseError.retryable = true;
+        throw emptyResponseError;
+      }
+
+      return data;
+    } catch (error) {
+      const normalizedError =
+        error?.name === 'AbortError'
+          ? Object.assign(new Error(`${label} timed out.`), { retryable: true })
+          : error;
+      lastError = normalizedError;
+
+      if (attempt >= attempts || normalizedError?.retryable === false) {
+        throw normalizedError;
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    await wait(250 * attempt);
   }
+
+  throw lastError;
 };
 
 const corsHeaders = (request, env) => {
@@ -111,11 +165,17 @@ const getBirthLocation = async (birthPlace, env) => {
   url.searchParams.set('q', birthPlace);
   url.searchParams.set('limit', '1');
 
-  const response = await fetchWithTimeout(url, {
-    headers: { 'X-API-Key': env.ROXY_API_KEY }
-  }, 5000, 'Birthplace lookup');
-
-  const data = await response.json();
+  const data = await fetchJsonWithRetry(
+    url,
+    {
+      headers: { 'X-API-Key': env.ROXY_API_KEY }
+    },
+    {
+      timeoutMs: 5000,
+      attempts: 2,
+      label: 'Birthplace lookup'
+    }
+  );
   const place = data?.cities?.[0];
   const latitude = Number(place?.latitude);
   const longitude = Number(place?.longitude);
@@ -140,35 +200,44 @@ const utcOffsetAtBirth = (date, time, timeZone) => {
 
 const requestNatalChart = async (reading, location, env) => {
   const timezone = utcOffsetAtBirth(reading.birth_date, reading.birth_time, location.timezone);
-  const response = await fetchWithTimeout(`${ROXY_API_BASE}/astrology/natal-chart?lang=en`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': env.ROXY_API_KEY
+  return fetchJsonWithRetry(
+    `${ROXY_API_BASE}/astrology/natal-chart?lang=en`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': env.ROXY_API_KEY
+      },
+      body: JSON.stringify({
+        date: reading.birth_date,
+        time: `${reading.birth_time}:00`,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timezone,
+        houseSystem: 'placidus'
+      })
     },
-    body: JSON.stringify({
-      date: reading.birth_date,
-      time: `${reading.birth_time}:00`,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      timezone,
-      houseSystem: 'placidus'
-    })
-  }, 7000, 'Natal-chart service');
-  return response.json();
+    {
+      timeoutMs: 7000,
+      attempts: 2,
+      label: 'Natal-chart service'
+    }
+  );
 };
 
 const createReading = async (reading, natalChart, env) => {
   if (!env.DEEPSEEK_API_KEY) throw new Error('DeepSeek is not configured.');
 
   const chartContext = JSON.stringify(natalChart).slice(0, MAX_CHART_CONTEXT);
-  const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`
-    },
-    body: JSON.stringify({
+  const data = await fetchJsonWithRetry(
+    'https://api.deepseek.com/chat/completions',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
       model: env.DEEPSEEK_MODEL || 'deepseek-chat',
       temperature: 0.7,
       max_tokens: 1200,
@@ -183,9 +252,14 @@ const createReading = async (reading, natalChart, env) => {
           content: `Create a concise, warm personalized reading for ${reading.name}. The flow must feel like: recognition → a gentle current-life friction → a small self-led practice → an optional symbolic bracelet reminder. Never use fear, scarcity, certainty, or manipulation. Return exactly this JSON shape:\n{\n  "archetype":"short poetic archetype, max 6 words",\n  "title":"a personal report title, max 8 words",\n  "opening":"a resonant 2-sentence insight, max 55 words",\n  "big_three":[\n    {"label":"Sun","sign":"sign name","meaning":"one practical sentence"},\n    {"label":"Moon","sign":"sign name","meaning":"one practical sentence"},\n    {"label":"Rising","sign":"sign name","meaning":"one practical sentence"}\n  ],\n  "tension":{"title":"short current-life tension title","body":"2 concise sentences that name a relatable friction without fear, max 65 words"},\n  "cost_now":["short realistic consequence 1, max 14 words","short realistic consequence 2, max 14 words","short realistic consequence 3, max 14 words"],\n  "ritual":{"intention":"short daily intention","practice":"one simple reflective practice, max 35 words","bracelet_cue":"one tactile, optional wearing cue, max 24 words"},\n  "bracelet":{"title":"A symbolic bracelet intention","crystals":["crystal 1","crystal 2","crystal 3"],"reason":"2 concise sentences about symbolic resonance, never a promise","ritual":"one optional, grounded moment to touch or notice the bracelet, max 24 words","cta_label":"EXPLORE YOUR ALIGNED BRACELETS"},\n  "disclaimer":"For reflection and personal inspiration. Your path is always your own."\n}\n\nBirth data: ${JSON.stringify(reading)}\n\nNatal-chart provider response: ${chartContext}`
         }
       ]
-    })
-  }, 12000, 'DeepSeek interpretation');
-  const data = await response.json();
+      })
+    },
+    {
+      timeoutMs: 12000,
+      attempts: 1,
+      label: 'DeepSeek interpretation'
+    }
+  );
   const text = data?.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error('The interpretation service returned no reading.');
   try {
@@ -200,10 +274,14 @@ export default {
     const headers = await requestHeaders(request, env);
     if (!headers) return json({ error: 'Unauthorized request.' }, 403);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
-    if (request.method === 'GET' && new URL(request.url).pathname === '/reading') {
+    const pathname = new URL(request.url).pathname;
+    // Direct Worker calls use /reading; Shopify App Proxy forwards as /apps/reading.
+    const readingPaths = ['/reading', '/apps/reading'];
+
+    if (request.method === 'GET' && readingPaths.includes(pathname)) {
       return json({ status: 'Qi Reading Proxy is ready.' }, 200, headers);
     }
-    if (request.method !== 'POST' || new URL(request.url).pathname !== '/reading') {
+    if (request.method !== 'POST' || !readingPaths.includes(pathname)) {
       return json({ error: 'Not found.' }, 404, headers);
     }
 
