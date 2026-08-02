@@ -13,7 +13,7 @@
       "type": "qi-sacred-astrology-hero",
       "settings": {
         "menu": "",
-        "api_endpoint": "/apps/reading",
+        "api_endpoint": "https://qi-reading-worker.wenzhouhaohua.workers.dev/reading",
         "eyebrow": "A PERSONAL ASTROLOGICAL JOURNEY",
         "heading": "Reveal The Story Written In Your Stars",
         "text": "<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>",
