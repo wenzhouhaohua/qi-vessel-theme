@@ -84,6 +84,9 @@ const fetchJsonWithRetry = async (
         } catch {
           // Non-JSON error body; keep the raw text detail.
         }
+        console.warn(
+          `${label} HTTP ${response.status} body=${JSON.stringify(text.slice(0, 500))}`
+        );
         const serviceError = new Error(
           `${label} returned ${response.status}${detail ? `: ${detail}` : ''}`
         );
@@ -232,7 +235,11 @@ const validReading = (payload) => {
 const locationCache = new Map();
 
 const getBirthLocation = async (birthPlace, env) => {
-  if (!env.ROXY_API_KEY) throw new Error('RoxyAPI is not configured.');
+  let apiKey = String(env.ROXY_API_KEY || '').trim();
+  if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
+    apiKey = apiKey.slice(1, -1).trim();
+  }
+  if (!apiKey) throw new Error('RoxyAPI is not configured.');
   const cacheKey = birthPlace.trim().toLowerCase();
   const cached = locationCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
@@ -244,7 +251,7 @@ const getBirthLocation = async (birthPlace, env) => {
   const data = await fetchJsonWithRetry(
     url,
     {
-      headers: { 'X-API-Key': env.ROXY_API_KEY }
+      headers: { 'X-API-Key': apiKey }
     },
     {
       timeoutMs: 5000,
@@ -406,6 +413,8 @@ export default {
       }, 200, headers);
     } catch (error) {
       console.error(error instanceof Error ? error.message : 'Unknown reading error');
+      const rawKey = String(env.ROXY_API_KEY || '');
+      console.warn(`roxy key len=${rawKey.length}`);
       const statusCode = error?.statusCode || 502;
       return json(
         { error: statusCode === 400 ? error.message : 'The stars are briefly obscured. Please try again in a moment.' },
