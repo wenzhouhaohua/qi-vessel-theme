@@ -1,11 +1,51 @@
 const DEFAULT_ORIGIN = 'https://qivessel.com';
 const MAX_CHART_CONTEXT = 18000;
+const MAX_REQUEST_BODY_BYTES = 8192;
+const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const ROXY_API_BASE = 'https://roxyapi.com/api/v2';
 const SHOPIFY_PROXY_MAX_AGE_SECONDS = 5 * 60;
+const LOCATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const LOCATION_CACHE_MAX_ENTRIES = 500;
+const decoder = new TextDecoder('utf-8');
+
+const readRequestBody = async (request) => {
+  const chunks = [];
+  let total = 0;
+  const reader = request.body?.getReader();
+  if (!reader) return '';
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        total += value.byteLength;
+        if (total > MAX_REQUEST_BODY_BYTES) {
+          await reader.cancel();
+          throw Object.assign(new Error('Request body is too large.'), { statusCode: 413 });
+        }
+        chunks.push(value);
+      }
+    }
+  } catch (error) {
+    if (error?.statusCode) throw error;
+    throw Object.assign(new Error('Unable to read request body.'), { statusCode: 400 });
+  }
+  const buffer = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    buffer.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return decoder.decode(buffer);
+};
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
-  headers: { 'Content-Type': 'application/json; charset=UTF-8', ...headers }
+  headers: {
+    'Content-Type': 'application/json; charset=UTF-8',
+    'Cache-Control': 'no-store',
+    ...headers
+  }
 });
 
 const wait = (milliseconds) =>
@@ -27,9 +67,32 @@ const fetchJsonWithRetry = async (
 
     try {
       const response = await fetch(url, { ...options, signal: controller.signal });
-      const text = await response.text();
-      let data = null;
+      const declaredLength = Number(response.headers.get('Content-Length') || 0);
+      if (declaredLength > MAX_RESPONSE_BYTES) {
+        const tooLargeError = new Error(`${label} response is too large.`);
+        tooLargeError.retryable = false;
+        throw tooLargeError;
+      }
+      const bytes = await response.arrayBuffer();
+      const text = decoder.decode(bytes.slice(0, MAX_RESPONSE_BYTES));
 
+      if (!response.ok) {
+        let detail = text.slice(0, 180);
+        try {
+          const data = JSON.parse(text);
+          detail = data?.error || data?.message || detail;
+        } catch {
+          // Non-JSON error body; keep the raw text detail.
+        }
+        const serviceError = new Error(
+          `${label} returned ${response.status}${detail ? `: ${detail}` : ''}`
+        );
+        serviceError.retryable =
+          response.status === 408 || response.status === 429 || response.status >= 500;
+        throw serviceError;
+      }
+
+      let data = null;
       if (text) {
         try {
           data = JSON.parse(text);
@@ -38,16 +101,6 @@ const fetchJsonWithRetry = async (
           invalidJsonError.retryable = true;
           throw invalidJsonError;
         }
-      }
-
-      if (!response.ok) {
-        const detail = data?.error || data?.message || text.slice(0, 180);
-        const serviceError = new Error(
-          `${label} returned ${response.status}${detail ? `: ${detail}` : ''}`
-        );
-        serviceError.retryable =
-          response.status === 408 || response.status === 429 || response.status >= 500;
-        throw serviceError;
       }
 
       if (!data) {
@@ -144,6 +197,16 @@ const requestHeaders = async (request, env) => {
 
 const cleanText = (value, maxLength) => typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
 
+const isValidDate = (value) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return day <= daysInMonth;
+};
+
+const isValidTime = (value) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+
 const validReading = (payload) => {
   const reading = {
     name: cleanText(payload?.name, 80),
@@ -153,14 +216,27 @@ const validReading = (payload) => {
     email: cleanText(payload?.email, 254)
   };
   const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reading.email);
-  const dateIsValid = /^\d{4}-\d{2}-\d{2}$/.test(reading.birth_date);
-  const timeIsValid = /^\d{2}:\d{2}$/.test(reading.birth_time);
-  if (!reading.name || !dateIsValid || !timeIsValid || !reading.birth_place || !emailIsValid) return null;
+  if (
+    !reading.name ||
+    !isValidDate(reading.birth_date) ||
+    !isValidTime(reading.birth_time) ||
+    !reading.birth_place ||
+    !emailIsValid
+  ) return null;
   return reading;
 };
 
+// In-isolate cache so repeat requests for the same city don't hit the
+// upstream location API (saves latency and quota). Not durable across
+// isolates, which is fine: it is only a performance optimization.
+const locationCache = new Map();
+
 const getBirthLocation = async (birthPlace, env) => {
   if (!env.ROXY_API_KEY) throw new Error('RoxyAPI is not configured.');
+  const cacheKey = birthPlace.trim().toLowerCase();
+  const cached = locationCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
   const url = new URL(`${ROXY_API_BASE}/location/search`);
   url.searchParams.set('q', birthPlace);
   url.searchParams.set('limit', '1');
@@ -180,9 +256,12 @@ const getBirthLocation = async (birthPlace, env) => {
   const latitude = Number(place?.latitude);
   const longitude = Number(place?.longitude);
   if (!place || !Number.isFinite(latitude) || !Number.isFinite(longitude) || !place.timezone) {
-    throw new Error('Birthplace not found.');
+    throw Object.assign(new Error('Birthplace not found.'), { statusCode: 400 });
   }
-  return { ...place, latitude, longitude };
+  const value = { ...place, latitude, longitude };
+  if (locationCache.size >= LOCATION_CACHE_MAX_ENTRIES) locationCache.clear();
+  locationCache.set(cacheKey, { value, expiresAt: Date.now() + LOCATION_CACHE_TTL_MS });
+  return value;
 };
 
 const utcOffsetAtBirth = (date, time, timeZone) => {
@@ -286,7 +365,27 @@ export default {
     }
 
     try {
-      const payload = await request.json();
+      const contentType = request.headers.get('Content-Type') || '';
+      if (!contentType.includes('application/json')) {
+        return json({ error: 'Content-Type must be application/json.' }, 415, headers);
+      }
+      const contentLength = Number(request.headers.get('Content-Length') || 0);
+      if (contentLength > MAX_REQUEST_BODY_BYTES) {
+        return json({ error: 'Request body is too large.' }, 413, headers);
+      }
+
+      let bodyText;
+      try {
+        bodyText = await readRequestBody(request);
+      } catch (error) {
+        return json({ error: errorMessage(error) }, error?.statusCode || 400, headers);
+      }
+      let payload;
+      try {
+        payload = JSON.parse(bodyText);
+      } catch {
+        return json({ error: 'Request body must be valid JSON.' }, 400, headers);
+      }
       const reading = validReading(payload);
       if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, headers);
 
@@ -304,7 +403,12 @@ export default {
       }, 200, headers);
     } catch (error) {
       console.error(error instanceof Error ? error.message : 'Unknown reading error');
-      return json({ error: 'The stars are briefly obscured. Please try again in a moment.' }, 502, headers);
+      const statusCode = error?.statusCode || 502;
+      return json(
+        { error: statusCode === 400 ? error.message : 'The stars are briefly obscured. Please try again in a moment.' },
+        statusCode,
+        headers
+      );
     }
   }
 };

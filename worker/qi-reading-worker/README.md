@@ -19,9 +19,11 @@ Never put a provider key in Shopify or Git. From this folder run:
 npx wrangler secret put ROXY_API_KEY
 npx wrangler secret put DEEPSEEK_API_KEY
 npx wrangler secret put ALLOWED_ORIGIN
+npx wrangler secret put SHOPIFY_API_SECRET
 ```
 
 Use `https://qivessel.com` as `ALLOWED_ORIGIN`. Add the `www` address as a comma-separated value only if that is also live.
+Set `SHOPIFY_API_SECRET` to the shared secret of the Shopify app that owns the App Proxy, so the Worker can verify the `signature` query parameter on `/apps/reading` requests. You can optionally set `SHOPIFY_SHOP_DOMAIN` (for example `your-shop.myshopify.com`) to reject proxy requests signed for any other shop.
 
 ## Deploy
 
@@ -39,4 +41,8 @@ Paste that complete URL into the Shopify theme editor under **QI Sacred Hero -> 
 
 ## Important
 
-This worker is deployable after RoxyAPI's documented request format is confirmed. It does not persist emails or reading data. The Shopify theme must still be updated to display the returned `report`; the current form only displays the short `message` field.
+This worker does not persist emails or reading data.
+
+The theme posts to `/apps/reading` (Shopify App Proxy) or directly to `/reading` on the Worker; both paths are accepted. App Proxy requests carry `signature`/`shop`/`timestamp` query parameters, which the Worker verifies with an HMAC-SHA256 digest before processing. Direct Worker calls are allowed only from origins listed in `ALLOWED_ORIGIN`.
+
+The theme renders the returned `profile` object (archetype, big three, tension, ritual, bracelet, disclaimer) inside the reading dialog.

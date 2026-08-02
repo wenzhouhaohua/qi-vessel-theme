@@ -1,7 +1,7 @@
 {
   "sections": {
     "birth-chart": {
-      "type": "birth-chart",
+      "type": "astrology-reading-form",
       "settings": {}
     }
   },

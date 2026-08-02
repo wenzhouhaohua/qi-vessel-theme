@@ -34,6 +34,8 @@
     const readingCrystals = root.querySelector('[data-reading-crystals]');
     const readingCta = root.querySelector('[data-reading-cta]');
     const readingNote = root.querySelector('[data-reading-note]');
+    const finePointer = window.matchMedia('(pointer:fine)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const showRitualLoading = () => {
       ritualLoading?.classList.remove('is-error');
@@ -48,28 +50,28 @@
       if (readingTitle) readingTitle.textContent = profile.title || 'Your Astral Profile';
       if (readingLocation) readingLocation.textContent = result.location ? `Birthplace resolved as ${result.location}` : '';
       if (readingOpening) readingOpening.textContent = profile.opening || result.report || result.message || '';
-    if (attentionTitle) attentionTitle.textContent = profile.attention?.title || 'What Wants Your Attention';
-    if (attentionBody) attentionBody.textContent = profile.attention?.body || '';
-    if (tensionTitle) tensionTitle.textContent = profile.tension?.title || profile.attention?.title || 'Where Your Energy Leaks';
-    if (tensionBody) tensionBody.textContent = profile.tension?.body || profile.attention?.body || '';
+      if (attentionTitle) attentionTitle.textContent = profile.attention?.title || 'What Wants Your Attention';
+      if (attentionBody) attentionBody.textContent = profile.attention?.body || '';
+      if (tensionTitle) tensionTitle.textContent = profile.tension?.title || profile.attention?.title || 'Where Your Energy Leaks';
+      if (tensionBody) tensionBody.textContent = profile.tension?.body || profile.attention?.body || '';
 
-    if (readingCostList) {
-      readingCostList.replaceChildren();
-      const costs = Array.isArray(profile.cost_now) ? profile.cost_now.slice(0, 3) : [];
-      costs.forEach((cost) => {
-        const item = document.createElement('li');
-        item.textContent = cost;
-        readingCostList.append(item);
-      });
-      if (readingCostSection) readingCostSection.hidden = !readingCostList.childElementCount;
-    }
+      if (readingCostList) {
+        readingCostList.replaceChildren();
+        const costs = Array.isArray(profile.cost_now) ? profile.cost_now.slice(0, 3) : [];
+        costs.forEach((cost) => {
+          const item = document.createElement('li');
+          item.textContent = cost;
+          readingCostList.append(item);
+        });
+        if (readingCostSection) readingCostSection.hidden = !readingCostList.childElementCount;
+      }
       if (ritualIntention) ritualIntention.textContent = profile.ritual?.intention || 'Return to your own rhythm.';
       if (ritualPractice) ritualPractice.textContent = profile.ritual?.practice || '';
-    if (braceletTitle) braceletTitle.textContent = profile.bracelet?.title || 'Your Aligned Bracelet';
-    if (braceletReason) braceletReason.textContent = profile.bracelet?.reason || '';
-    const braceletCue = profile.bracelet?.ritual || profile.ritual?.bracelet_cue || '';
-    if (braceletRitual) braceletRitual.textContent = braceletCue;
-    if (braceletRitualWrap) braceletRitualWrap.hidden = !braceletCue;
+      if (braceletTitle) braceletTitle.textContent = profile.bracelet?.title || 'Your Aligned Bracelet';
+      if (braceletReason) braceletReason.textContent = profile.bracelet?.reason || '';
+      const braceletCue = profile.bracelet?.ritual || profile.ritual?.bracelet_cue || '';
+      if (braceletRitual) braceletRitual.textContent = braceletCue;
+      if (braceletRitualWrap) braceletRitualWrap.hidden = !braceletCue;
       if (readingNote) readingNote.textContent = profile.disclaimer || 'For reflection and personal inspiration. Your path is always your own.';
       if (readingCta) {
         const label = document.createTextNode(profile.bracelet?.cta_label || 'EXPLORE YOUR ALIGNED BRACELETS');
@@ -119,7 +121,7 @@
 
     closeDialog?.addEventListener('click', () => dialog?.close());
 
-    if (window.matchMedia('(pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (finePointer && !reducedMotion) {
       root.addEventListener('pointermove', (event) => {
         const rect = root.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width - .5);
@@ -131,7 +133,7 @@
       }, { passive: true });
     }
 
-    if (!window.matchMedia('(pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!finePointer && !reducedMotion) {
       let touchFrame;
       let touchReset;
       const setMobileDepth = (clientX, clientY) => {
@@ -214,25 +216,27 @@
 
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      status.textContent = '';
+      if (status) status.textContent = '';
 
       if (!form.checkValidity()) {
         form.reportValidity();
-        status.textContent = 'Please complete each sacred detail before continuing.';
+        if (status) status.textContent = 'Please complete each sacred detail before continuing.';
         return;
       }
 
       const payload = Object.fromEntries(new FormData(form).entries());
       const endpoint = root.dataset.apiEndpoint?.trim();
+      const submitButton = form.querySelector('[type="submit"]');
       const stages = ['ALIGNING YOUR CELESTIAL PATTERNS…', 'READING YOUR ENERGY SIGNATURE…', 'PREPARING YOUR SACRED MAP…'];
       let index = 0;
       let keepDialogOpen = false;
-      stage.textContent = stages[index];
+      if (stage) stage.textContent = stages[index];
       showRitualLoading();
       dialog?.showModal();
+      if (submitButton) submitButton.disabled = true;
       const stageTimer = window.setInterval(() => {
         index = (index + 1) % stages.length;
-        stage.textContent = stages[index];
+        if (stage) stage.textContent = stages[index];
       }, 1200);
 
       try {
@@ -242,23 +246,24 @@
           else if (result.profile || result.report) {
             showReadingResult(result);
             keepDialogOpen = true;
-            status.textContent = 'Your astral profile is ready.';
-          } else status.textContent = result.message || 'Your astral profile is ready.';
+            if (status) status.textContent = 'Your astral profile is ready.';
+          } else if (status) status.textContent = result.message || 'Your astral profile is ready.';
         } else {
           await new Promise((resolve) => window.setTimeout(resolve, 2700));
-          status.textContent = `Thank you, ${payload.name}. Your sacred profile has been received.`;
+          if (status) status.textContent = `Thank you, ${payload.name}. Your sacred profile has been received.`;
         }
       } catch (error) {
         console.error('Qi reading request failed:', error);
         const message = error?.name === 'AbortError'
           ? 'This reading is taking longer than expected. Please try again in a moment.'
           : 'The stars are briefly obscured. Please try again in a moment.';
-        status.textContent = message;
-        stage.textContent = message;
+        if (status) status.textContent = message;
+        if (stage) stage.textContent = message;
         ritualLoading?.classList.add('is-error');
         keepDialogOpen = true;
       } finally {
         window.clearInterval(stageTimer);
+        if (submitButton) submitButton.disabled = false;
         if (!keepDialogOpen) dialog?.close();
       }
     });

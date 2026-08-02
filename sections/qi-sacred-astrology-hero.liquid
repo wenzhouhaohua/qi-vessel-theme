@@ -1,3 +1,5 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {{ 'qi-sacred-hero.css' | asset_url | stylesheet_tag }}
 {{ 'qi-sacred-hero-final.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'qi-sacred-hero.js' | asset_url }}" defer></script>
@@ -9,8 +11,10 @@
   data-api-endpoint="{{ section.settings.api_endpoint | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
-    <img class="qi-sacred__cinematic-scene qi-sacred__cinematic-scene--desktop" src="{{ 'qi-sacred-hero-guardian-v19.png' | asset_url }}" alt="" width="1664" height="936" loading="eager" fetchpriority="high">
-    <img class="qi-sacred__cinematic-scene qi-sacred__cinematic-scene--mobile" src="{{ 'qi-sacred-hero-guardian-mobile-v19.png' | asset_url }}" alt="" width="936" height="1664" loading="eager" fetchpriority="high">
+    <picture>
+      <source media="(max-width: 899px)" srcset="{{ 'qi-sacred-hero-guardian-mobile-v19.png' | asset_url }}" width="936" height="1664">
+      <img class="qi-sacred__cinematic-scene qi-sacred__cinematic-scene--desktop" src="{{ 'qi-sacred-hero-guardian-v19.png' | asset_url }}" alt="" width="1664" height="936" loading="eager" fetchpriority="high" decoding="async">
+    </picture>
     <span class="qi-sacred__nebula qi-sacred__nebula--one"></span>
     <span class="qi-sacred__nebula qi-sacred__nebula--two"></span>
     <span class="qi-sacred__stars qi-sacred__stars--far"></span>
@@ -73,7 +77,7 @@
 
     <div class="qi-sacred__oracle" aria-label="Sacred astrology guide">
       <div class="qi-sacred__beam" aria-hidden="true"></div>
-      <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-oracle-final.webp' | asset_url }}" alt="Celestial oracle in a sacred astrology ritual" width="670" height="770" loading="eager" fetchpriority="high">
+      <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-oracle-final.webp' | asset_url }}" alt="Celestial oracle in a sacred astrology ritual" width="670" height="770" loading="lazy" decoding="async">
       <span class="qi-sacred__oracle-vignette" aria-hidden="true"></span>
     </div>
 
