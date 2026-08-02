@@ -312,7 +312,11 @@ const requestNatalChart = async (reading, location, env) => {
 };
 
 const createReading = async (reading, natalChart, env) => {
-  if (!env.DEEPSEEK_API_KEY) throw new Error('DeepSeek is not configured.');
+  let deepSeekKey = String(env.DEEPSEEK_API_KEY || '').trim();
+  if ((deepSeekKey.startsWith('"') && deepSeekKey.endsWith('"')) || (deepSeekKey.startsWith("'") && deepSeekKey.endsWith("'"))) {
+    deepSeekKey = deepSeekKey.slice(1, -1).trim();
+  }
+  if (!deepSeekKey) throw new Error('DeepSeek is not configured.');
 
   const chartContext = JSON.stringify(natalChart).slice(0, MAX_CHART_CONTEXT);
   const data = await fetchJsonWithRetry(
@@ -321,7 +325,7 @@ const createReading = async (reading, natalChart, env) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`
+        Authorization: `Bearer ${deepSeekKey}`
       },
       body: JSON.stringify({
       model: env.DEEPSEEK_MODEL || 'deepseek-chat',
@@ -414,7 +418,9 @@ export default {
     } catch (error) {
       console.error(error instanceof Error ? error.message : 'Unknown reading error');
       const rawKey = String(env.ROXY_API_KEY || '');
-      console.warn(`roxy key len=${rawKey.length}`);
+      const rawDeep = String(env.DEEPSEEK_API_KEY || '');
+      const keyDiag = `roxy len=${rawKey.length} deepseek len=${rawDeep.length}`;
+      console.warn(keyDiag);
       const statusCode = error?.statusCode || 502;
       return json(
         { error: statusCode === 400 ? error.message : 'The stars are briefly obscured. Please try again in a moment.' },
