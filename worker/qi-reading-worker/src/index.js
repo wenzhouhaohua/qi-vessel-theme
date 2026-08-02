@@ -353,14 +353,17 @@ export default {
     const headers = await requestHeaders(request, env);
     if (!headers) return json({ error: 'Unauthorized request.' }, 403);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
-    const pathname = new URL(request.url).pathname;
-    // Direct Worker calls use /reading; Shopify App Proxy forwards as /apps/reading.
-    const readingPaths = ['/reading', '/apps/reading'];
+    // Direct Worker calls use /reading; Shopify App Proxy forwards as
+    // /apps/reading (or /reading with a trailing slash depending on the
+    // configured proxy URL), so normalize trailing slashes away.
+    const pathname = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
+    const readingPaths = ['/reading', '/apps/reading', '/'];
 
     if (request.method === 'GET' && readingPaths.includes(pathname)) {
       return json({ status: 'Qi Reading Proxy is ready.' }, 200, headers);
     }
     if (request.method !== 'POST' || !readingPaths.includes(pathname)) {
+      console.warn(`Qi reading: rejected path "${pathname}".`);
       return json({ error: 'Not found.' }, 404, headers);
     }
 
