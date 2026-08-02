@@ -12,6 +12,10 @@
   {%- if api_endpoint contains '://' -%}
     {%- assign api_endpoint = '/apps/reading' -%}
   {%- endif -%}
+    {%- assign api_endpoint = section.settings.api_endpoint | default: '/apps/reading' | strip -%}
+  {%- if api_endpoint contains '://' -%}
+    {%- assign api_endpoint = '/apps/reading' -%}
+  {%- endif -%}
   data-api-endpoint="{{ api_endpoint | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
