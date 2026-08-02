@@ -225,7 +225,10 @@
       }
 
       const payload = Object.fromEntries(new FormData(form).entries());
-      const endpoint = root.dataset.apiEndpoint?.trim();
+      // Prefer a same-origin relative path (works on mobile/desktop without
+      // relying on direct workers.dev reachability from the visitor's network).
+      const configuredEndpoint = root.dataset.apiEndpoint?.trim() || '';
+      const endpoint = configuredEndpoint.startsWith('/') ? configuredEndpoint : '/apps/reading';
       const submitButton = form.querySelector('[type="submit"]');
       const stages = ['ALIGNING YOUR CELESTIAL PATTERNS…', 'READING YOUR ENERGY SIGNATURE…', 'PREPARING YOUR SACRED MAP…'];
       let index = 0;

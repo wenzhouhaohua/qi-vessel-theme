@@ -8,7 +8,11 @@
   id="QiSacredHero-{{ section.id }}"
   class="qi-sacred"
   data-qi-sacred
-  data-api-endpoint="{{ section.settings.api_endpoint | escape }}"
+  {%- assign api_endpoint = section.settings.api_endpoint | default: '/apps/reading' | strip -%}
+  {%- if api_endpoint contains '://' -%}
+    {%- assign api_endpoint = '/apps/reading' -%}
+  {%- endif -%}
+  data-api-endpoint="{{ api_endpoint | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
     <picture>
@@ -179,7 +183,7 @@
   "settings": [
     {"type":"image_picker","id":"priestess","label":"Priestess image"},
     {"type":"link_list","id":"menu","label":"Navigation menu"},
-    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","info":"Optional. Leave blank until your secure server endpoint is ready."},
+    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","default":"/apps/reading","info":"Keep as /apps/reading so requests stay on your store domain (works on mobile and desktop)."},
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
     {"type":"inline_richtext","id":"heading","label":"Heading","default":"Reveal The Story Written In Your Stars"},
     {"type":"richtext","id":"text","label":"Introduction","default":"<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>"},
