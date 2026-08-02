@@ -12,3 +12,388 @@
 @media(max-width:899px){.qi-sacred__nav{width:calc(100% - 24px);height:64px;grid-template-columns:1fr auto}.qi-sacred__brand-mark{width:42px;height:42px}.qi-sacred__brand-copy strong{font-size:20px}.qi-sacred__links,.qi-sacred__actions{display:none}.qi-sacred__menu-toggle{display:block;border:0;background:none;padding:8px}.qi-sacred__menu-toggle span:not(.visually-hidden){display:block;width:22px;height:1px;margin:5px;background:var(--qi-gold)}.qi-sacred__stage{width:100%;height:auto;min-height:0;padding-top:365px;display:flex;flex-direction:column}.qi-sacred__oracle{position:absolute;top:0;height:420px;align-items:flex-start}.qi-sacred__priestess{height:405px;max-height:none;margin-top:0;-webkit-mask-image:linear-gradient(#000 72%,transparent 100%);mask-image:linear-gradient(#000 72%,transparent 100%)}.qi-sacred__oracle-vignette{background:linear-gradient(180deg,transparent 54%,#020309 100%)}.qi-sacred__copy{display:none}.qi-sacred__record{position:relative;left:auto;top:auto;order:1;width:calc(100% - 18px);max-width:620px;margin:-45px auto 0;transform:none;padding:46px 14px 18px}.qi-sacred__pillars{grid-template-columns:1fr 1fr}.qi-sacred__pillars article:nth-child(2){border-right:0}.qi-sacred__journey h2{font-size:34px}}
 @media(max-width:520px){.qi-sacred__stage{padding-top:330px}.qi-sacred__oracle{height:370px}.qi-sacred__priestess{height:360px}.qi-sacred__record{width:calc(100% - 12px);margin-top:-35px;padding:44px 12px 16px}.qi-sacred__record h2{font-size:26px}.qi-sacred__form{grid-template-columns:1fr 1fr;gap:8px 7px}.qi-sacred__field:nth-of-type(1),.qi-sacred__field:nth-of-type(4),.qi-sacred__field:nth-of-type(5),.qi-sacred__submit,.qi-sacred__trust,.qi-sacred__privacy,.qi-sacred__status{grid-column:1/-1}.qi-sacred__input input{height:48px;font-size:16px}.qi-sacred__submit{height:54px}.qi-sacred__journey{padding-inline:14px}.qi-sacred__pillars{grid-template-columns:1fr}.qi-sacred__pillars article{border-right:0;border-bottom:1px solid rgba(217,168,93,.18)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Cinematic enhancement layer: depth, parallax and living celestial light. */
+.qi-sacred {
+  --qi-x: 0px;
+  --qi-y: 0px;
+  --qi-oracle-x: 0px;
+  --qi-oracle-y: 0px;
+}
+.qi-sacred::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: .52;
+  background:
+    radial-gradient(ellipse 42% 38% at calc(50% + var(--qi-x)) calc(28% + var(--qi-y)), rgba(242, 193, 119, .13), transparent 72%),
+    linear-gradient(90deg, rgba(0,0,0,.42), transparent 25%, transparent 72%, rgba(0,0,0,.42));
+  mix-blend-mode: screen;
+}
+.qi-sacred__cosmos::before,
+.qi-sacred__cosmos::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  width: min(84vw, 1120px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(230, 187, 116, .13);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  box-shadow: inset 0 0 70px rgba(214, 146, 81, .03), 0 0 80px rgba(213, 145, 80, .025);
+}
+.qi-sacred__cosmos::after {
+  width: min(57vw, 760px);
+  border-color: rgba(240, 206, 145, .19);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: qi-orbit 32s linear infinite;
+}
+.qi-sacred__nebula { animation: qi-breathe 13s ease-in-out infinite alternate; }
+.qi-sacred__nebula--two { animation-delay: -6s; }
+.qi-sacred__stars--far { animation: qi-drift 30s linear infinite alternate; }
+.qi-sacred__stars--near { animation: qi-drift 18s linear infinite alternate-reverse; }
+.qi-sacred__light-column { animation: qi-shimmer 8s ease-in-out infinite; }
+.qi-sacred__priestess { transform: translate3d(var(--qi-oracle-x), var(--qi-oracle-y), 0) scale(1.025); transition: transform .7s cubic-bezier(.2,.72,.22,1); }
+.qi-sacred__record { transition: transform .45s ease, box-shadow .45s ease, border-color .45s ease; }
+@media (hover:hover) and (min-width:900px) { .qi-sacred__record:hover { transform: translate(-50%, -47%); border-color: rgba(243, 202, 133, .72); box-shadow: 0 40px 100px rgba(0,0,0,.62), 0 0 72px rgba(217,168,93,.18), inset 0 1px 0 rgba(255,255,255,.12); } }
+.qi-sacred__submit { position: relative; overflow: hidden; letter-spacing: .14em; transition: transform .25s ease, filter .25s ease, box-shadow .25s ease; }
+.qi-sacred__submit::after { content:''; position:absolute; inset:-40% 60% -40% -35%; background:linear-gradient(100deg, transparent, rgba(255,255,255,.58), transparent); transform:skewX(-20deg); transition:inset .7s ease; }
+.qi-sacred__submit:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 15px 38px rgba(218,153,75,.42), inset 0 1px rgba(255,255,255,.6); }
+.qi-sacred__submit:hover::after { inset:-40% -35% -40% 60%; }
+@keyframes qi-orbit { to { transform: translate(-50%, -50%) rotate(342deg); } }
+@keyframes qi-breathe { to { transform: scale(1.12) translate3d(2vw, -1vh, 0); opacity: .53; } }
+@keyframes qi-drift { to { transform: translate3d(24px, -18px, 0); } }
+@keyframes qi-shimmer { 50% { opacity:.88; transform:translateX(-50%) scaleX(1.3); } }
+@media (prefers-reduced-motion:reduce) { .qi-sacred__cosmos::after,.qi-sacred__nebula,.qi-sacred__stars,.qi-sacred__light-column { animation:none; } .qi-sacred__priestess { transition:none; } }
+
+/* V2 art direction: dedicated right-side oracle stage preserves a clear conversion zone. */
+.qi-sacred__cinematic-scene { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; opacity:.96; filter:saturate(.88) contrast(1.06) brightness(.82); }
+.qi-sacred__cosmos::before,.qi-sacred__cosmos::after { display:none; }
+.qi-sacred__nebula--one { width:68vw; height:78vh; left:-28vw; top:10vh; background:rgba(30,19,60,.78); filter:blur(52px); opacity:.76; }
+.qi-sacred__nebula--two { width:40vw; height:70vh; right:-22vw; top:14vh; background:rgba(79,42,88,.24); opacity:.35; }
+.qi-sacred__stars { opacity:.13; mix-blend-mode:screen; }
+.qi-sacred__light-column,.qi-sacred__temple,.qi-sacred__dust,.qi-sacred__oracle { display:none; }
+.qi-sacred::before { z-index:-1; background:linear-gradient(90deg,rgba(3,3,10,.78) 0%,rgba(5,4,12,.7) 37%,rgba(5,4,12,.22) 61%,rgba(3,3,10,.12) 100%),linear-gradient(180deg,rgba(0,0,0,.2),transparent 32%,rgba(1,2,5,.58) 100%); }
+.qi-sacred__stage { min-height:720px; }
+.qi-sacred__copy { left:clamp(26px,5.8vw,110px); width:min(315px,23vw); }
+.qi-sacred__copy h1 { font-size:clamp(42px,3.35vw,61px); line-height:1.02; text-shadow:0 10px 42px rgba(0,0,0,.7); }
+.qi-sacred__intro { max-width:290px; font-size:12px; }
+.qi-sacred__record { left:43%; width:min(412px,28vw); transform:translate(-50%,-46%); padding:44px 24px 19px; background:radial-gradient(circle at 50% -10%,rgba(244,199,126,.15),transparent 28%),linear-gradient(145deg,rgba(18,12,21,.82),rgba(6,6,12,.77)); box-shadow:0 34px 92px rgba(0,0,0,.58),0 0 48px rgba(217,168,93,.11),inset 0 1px 0 rgba(255,255,255,.1); }
+@media (hover:hover) and (min-width:900px) { .qi-sacred__record:hover { transform:translate(-50%,-47%); } }
+@media(max-width:1180px) and (min-width:900px) { .qi-sacred__copy { left:24px; width:245px; } .qi-sacred__record { left:44%; width:390px; } }
+@media(max-width:899px) { .qi-sacred__cinematic-scene { object-position:72% center; opacity:.78; } .qi-sacred__stage { padding-top:390px; } .qi-sacred__record { left:auto; width:calc(100% - 18px); } .qi-sacred__nebula--one { width:120vw; left:-55vw; opacity:.62; } }
+
+/* Mobile art direction: the oracle becomes an immersive backdrop and the form is a translucent ritual object. */
+@media(max-width:899px) {
+  .qi-sacred__stage { min-height:calc(100svh - 64px); padding:32px 0; display:grid; place-items:center; overflow:hidden; }
+  .qi-sacred__cinematic-scene { object-position:72% center; opacity:.38; filter:saturate(.7) contrast(1.05) brightness(.47); }
+  .qi-sacred__oracle { display:block; position:absolute; inset:0; height:auto; z-index:1; opacity:.88; pointer-events:none; }
+  .qi-sacred__priestess { display:block; width:100%; height:100%; max-height:none; margin:0; object-fit:cover; object-position:center 18%; transform:none; filter:saturate(.84) contrast(1.06) brightness(.7); -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 13%,#000 78%,transparent 100%); mask-image:linear-gradient(180deg,transparent 0%,#000 13%,#000 78%,transparent 100%); }
+  .qi-sacred__oracle-vignette { display:block; background:radial-gradient(ellipse at 50% 40%,transparent 14%,rgba(2,3,9,.12) 47%,#020309 100%),linear-gradient(90deg,rgba(2,3,9,.36),transparent 30%,transparent 70%,rgba(2,3,9,.36)); }
+  .qi-sacred__record { position:relative; left:auto; top:auto; z-index:8; width:min(92vw,520px); margin:0 auto; transform:none; padding:45px 18px 20px; border-color:rgba(242,201,132,.55); border-radius:22px; background:linear-gradient(145deg,rgba(19,12,23,.57),rgba(5,5,12,.62)); -webkit-backdrop-filter:blur(22px) saturate(145%); backdrop-filter:blur(22px) saturate(145%); box-shadow:0 28px 70px rgba(0,0,0,.56),0 0 48px rgba(217,168,93,.13),inset 0 1px 0 rgba(255,255,255,.14); }
+  .qi-sacred__record h2 { font-size:31px; }
+  .qi-sacred__record>p { max-width:285px; font-size:10px; }
+  .qi-sacred__form { gap:8px; }
+  .qi-sacred__input input { height:46px; background:rgba(2,2,7,.38); font-size:16px; }
+  .qi-sacred__submit { height:52px; margin-top:6px; }
+  .qi-sacred__trust { padding-top:10px; }
+  .qi-sacred__privacy { margin-top:6px!important; font-size:7px!important; }
+}
+
+/* V8 guardian composition: the veiled feminine oracle remains visible through the ritual card. */
+.qi-sacred__cinematic-scene--mobile { display:none; }
+.qi-sacred__cinematic-scene--desktop {
+  transform:translate3d(var(--qi-oracle-x, 0), var(--qi-oracle-y, 0), 0) scale(1.025);
+  transform-origin:center center;
+  transition:transform .85s cubic-bezier(.2,.72,.22,1), filter .65s ease;
+}
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.82) contrast(.98) brightness(.88);
+}
+.qi-sacred::before {
+  background:
+    linear-gradient(90deg, rgba(23,18,37,.30) 0%, rgba(31,24,46,.07) 33%, rgba(31,24,46,.06) 67%, rgba(23,18,37,.22) 100%),
+    linear-gradient(180deg, rgba(14,10,24,.12), transparent 28%, rgba(15,11,25,.28) 100%);
+}
+.qi-sacred__nebula--one { background:rgba(75,58,112,.22); opacity:.42; }
+.qi-sacred__nebula--two { background:rgba(231,190,137,.13); opacity:.28; }
+.qi-sacred__stars { opacity:.17; }
+.qi-sacred__record {
+  background:linear-gradient(145deg, rgba(38,30,54,.42), rgba(20,18,38,.46));
+  border-color:rgba(255,240,210,.62);
+  -webkit-backdrop-filter:blur(16px) saturate(132%);
+  backdrop-filter:blur(16px) saturate(132%);
+  box-shadow:0 34px 90px rgba(26,18,43,.30), 0 0 72px rgba(250,220,165,.17), inset 0 1px 0 rgba(255,255,255,.27);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#fae7c3; text-shadow:0 2px 16px rgba(58,39,83,.34); }
+.qi-sacred__input input { background:rgba(26,22,39,.31); border-color:rgba(255,232,192,.43); }
+.qi-sacred__input input:focus { border-color:rgba(255,225,167,.9); box-shadow:0 0 0 3px rgba(245,202,129,.16); }
+.qi-sacred__submit { box-shadow:0 12px 30px rgba(217,158,77,.27), inset 0 1px 0 rgba(255,255,255,.58); }
+.qi-sacred.is-touch-lit .qi-sacred__record { border-color:rgba(255,239,196,.9); box-shadow:0 34px 90px rgba(26,18,43,.30), 0 0 100px rgba(255,224,166,.34), inset 0 1px 0 rgba(255,255,255,.34); }
+@media (prefers-reduced-motion:no-preference) {
+  .qi-sacred__cinematic-scene--desktop { animation:qi-guardian-float 9s ease-in-out infinite alternate; }
+}
+@keyframes qi-guardian-float { to { transform:translate3d(var(--qi-oracle-x, 0), calc(var(--qi-oracle-y, 0) - 10px), 0) scale(1.045); } }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--desktop { display:none; }
+  .qi-sacred__cinematic-scene--mobile {
+    display:block;
+    object-position:center center;
+    opacity:.96;
+    filter:saturate(.82) contrast(.98) brightness(.86);
+    transform:translate3d(0, var(--qi-mobile-shift, 0), 0) scale(1.055);
+    transition:transform .65s cubic-bezier(.2,.72,.22,1), filter .45s ease;
+  }
+  .qi-sacred__stage { min-height:calc(100svh - 64px); }
+  .qi-sacred::before { background:linear-gradient(180deg, rgba(25,19,40,.15), transparent 25%, rgba(21,16,37,.24) 100%); }
+  .qi-sacred__record {
+    background:linear-gradient(145deg, rgba(42,34,59,.40), rgba(21,19,39,.45));
+    border-color:rgba(255,239,210,.62);
+    box-shadow:0 24px 65px rgba(26,18,43,.26), 0 0 55px rgba(250,220,165,.16), inset 0 1px 0 rgba(255,255,255,.26);
+  }
+  .qi-sacred__input input { background:rgba(28,24,43,.28); }
+}
+@media(max-width:520px) {
+  .qi-sacred__cinematic-scene--mobile { object-position:center top; }
+  .qi-sacred__record { background:linear-gradient(145deg, rgba(42,34,59,.38), rgba(21,19,39,.43)); }
+}
+
+/* Ethereal oracle palette: retain the apparition through the glass without sacrificing form legibility. */
+.qi-sacred__cinematic-scene { filter:saturate(.76) contrast(1.07) brightness(.72); }
+.qi-sacred__record { background:linear-gradient(145deg,rgba(13,12,22,.43),rgba(5,6,14,.52)); border-color:rgba(242,232,209,.52); box-shadow:0 36px 100px rgba(0,0,0,.44),0 0 76px rgba(230,215,180,.12),inset 0 1px 0 rgba(255,255,255,.18); }
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#f3dfbd; }
+.qi-sacred__input input { background:rgba(5,7,13,.30); border-color:rgba(236,221,190,.34); }
+@media(max-width:899px) { .qi-sacred__cinematic-scene { filter:saturate(.7) contrast(1.08) brightness(.68); } .qi-sacred__record { background:linear-gradient(145deg,rgba(13,12,22,.38),rgba(5,6,14,.50)); } }
+
+
+@media(max-width:520px) {
+  .qi-sacred__stage { min-height:calc(100svh - 64px); padding:20px 0; }
+  .qi-sacred__oracle { opacity:.78; }
+  .qi-sacred__priestess { object-position:center 12%; }
+  .qi-sacred__record { width:calc(100% - 22px); padding:42px 14px 18px; }
+  .qi-sacred__form { grid-template-columns:1fr; }
+  .qi-sacred__field,.qi-sacred__field:nth-of-type(1),.qi-sacred__field:nth-of-type(4),.qi-sacred__field:nth-of-type(5),.qi-sacred__submit,.qi-sacred__trust,.qi-sacred__privacy,.qi-sacred__status { grid-column:auto; }
+}
+
+/* V3: a centered goddess and translucent profile card deliberately overlap as one sacred ritual. */
+.qi-sacred__cinematic-scene { object-position:center center; opacity:1; filter:saturate(.93) contrast(1.08) brightness(.74); }
+.qi-sacred::before { background:linear-gradient(90deg,rgba(3,3,10,.62) 0%,rgba(5,4,12,.22) 30%,rgba(5,4,12,.12) 70%,rgba(3,3,10,.38) 100%),linear-gradient(180deg,rgba(0,0,0,.12),transparent 30%,rgba(1,2,5,.56) 100%); }
+.qi-sacred__copy { left:clamp(26px,4.5vw,86px); }
+.qi-sacred__record { left:50%; width:min(430px,30vw); background:linear-gradient(145deg,rgba(22,13,28,.48),rgba(6,6,13,.54)); border-color:rgba(246,207,144,.58); -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%); box-shadow:0 36px 100px rgba(0,0,0,.48),0 0 74px rgba(220,161,86,.16),inset 0 1px 0 rgba(255,255,255,.18); }
+.qi-sacred__record::before,.qi-sacred__record::after { opacity:.9; }
+.qi-sacred__input input { background:rgba(6,4,10,.28); border-color:rgba(240,195,128,.36); }
+@media (hover:hover) and (min-width:900px) { .qi-sacred__record:hover { transform:translate(-50%,-47%); } }
+@media(max-width:899px) {
+  .qi-sacred__oracle { display:none; }
+  .qi-sacred__cinematic-scene { object-position:center center; opacity:.9; filter:saturate(.9) contrast(1.08) brightness(.67); }
+  .qi-sacred::before { background:radial-gradient(ellipse at 50% 45%,transparent 5%,rgba(4,3,9,.18) 58%,rgba(2,3,9,.72) 100%); }
+  .qi-sacred__record { left:auto; width:min(92vw,520px); background:linear-gradient(145deg,rgba(22,13,28,.44),rgba(5,5,12,.52)); border-color:rgba(246,207,144,.56); -webkit-backdrop-filter:blur(17px) saturate(140%); backdrop-filter:blur(17px) saturate(140%); }
+}
+
+/* Final V8 cascade: luminous guardian, visible hands, and medium-translucent form glass. */
+.qi-sacred__cinematic-scene--desktop {
+  display:block;
+  object-position:center center;
+  opacity:1;
+  filter:saturate(.82) contrast(.98) brightness(.88);
+  transform:translate3d(var(--qi-oracle-x, 0), var(--qi-oracle-y, 0), 0) scale(1.025);
+}
+.qi-sacred__cinematic-scene--mobile { display:none; }
+.qi-sacred::before { background:linear-gradient(90deg,rgba(23,18,37,.30),rgba(31,24,46,.07) 33%,rgba(31,24,46,.06) 67%,rgba(23,18,37,.22)),linear-gradient(180deg,rgba(14,10,24,.12),transparent 28%,rgba(15,11,25,.28)); }
+.qi-sacred__record { background:linear-gradient(145deg,rgba(38,30,54,.42),rgba(20,18,38,.46)); border-color:rgba(255,240,210,.62); -webkit-backdrop-filter:blur(16px) saturate(132%); backdrop-filter:blur(16px) saturate(132%); box-shadow:0 34px 90px rgba(26,18,43,.30),0 0 72px rgba(250,220,165,.17),inset 0 1px 0 rgba(255,255,255,.27); }
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#fae7c3; text-shadow:0 2px 16px rgba(58,39,83,.34); }
+.qi-sacred__input input { background:rgba(26,22,39,.31); border-color:rgba(255,232,192,.43); }
+.qi-sacred__input input:focus { border-color:rgba(255,225,167,.9); box-shadow:0 0 0 3px rgba(245,202,129,.16); }
+.qi-sacred__submit { box-shadow:0 12px 30px rgba(217,158,77,.27),inset 0 1px 0 rgba(255,255,255,.58); }
+.qi-sacred.is-touch-lit .qi-sacred__record { border-color:rgba(255,239,196,.9); box-shadow:0 34px 90px rgba(26,18,43,.30),0 0 100px rgba(255,224,166,.34),inset 0 1px 0 rgba(255,255,255,.34); }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--desktop { display:none; }
+  .qi-sacred__cinematic-scene--mobile { display:block; object-position:center center; opacity:.96; filter:saturate(.82) contrast(.98) brightness(.86); transform:translate3d(0,var(--qi-mobile-shift,0),0) scale(1.055); }
+  .qi-sacred::before { background:linear-gradient(180deg,rgba(25,19,40,.15),transparent 25%,rgba(21,16,37,.24)); }
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(42,34,59,.40),rgba(21,19,39,.45)); border-color:rgba(255,239,210,.62); box-shadow:0 24px 65px rgba(26,18,43,.26),0 0 55px rgba(250,220,165,.16),inset 0 1px 0 rgba(255,255,255,.26); }
+  .qi-sacred__input input { background:rgba(28,24,43,.28); }
+}
+@media(max-width:520px) { .qi-sacred__cinematic-scene--mobile { object-position:center top; } .qi-sacred__record { background:linear-gradient(145deg,rgba(42,34,59,.38),rgba(21,19,39,.43)); } }
+
+/* V9 composition correction: never place the guardian's face beneath the form. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 88px),0) scale(1.025);
+  }
+  .qi-sacred__record { transform:translate(-50%,-39%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-40%); }
+}
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile {
+    transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 52px),0) scale(1.055);
+  }
+}
+@keyframes qi-guardian-float { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 98px),0) scale(1.045); } }
+
+/* V10: reference-faithful face and a calmer, correctly scaled stage. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-float-v10 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 18px),0) scale(1.01);
+  }
+  .qi-sacred__record { transform:translate(-50%,-43%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-44%); }
+}
+@keyframes qi-guardian-float-v10 { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 28px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 12px),0) scale(1.02); }
+  .qi-sacred__stage { min-height:max(calc(100svh - 64px), 820px); padding-top:128px; padding-bottom:18px; }
+}
+
+/* V11 conversion-first palette: warm light glass, with the form clearly leading the scene. */
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.72) contrast(.95) brightness(.98) sepia(.08);
+}
+.qi-sacred::before {
+  background:
+    linear-gradient(90deg, rgba(53,39,54,.18) 0%, rgba(255,244,220,.03) 34%, rgba(255,244,220,.02) 70%, rgba(53,39,54,.13) 100%),
+    linear-gradient(180deg, rgba(255,245,224,.08), transparent 31%, rgba(76,54,70,.13) 100%);
+}
+.qi-sacred__nebula--one { background:rgba(252,228,189,.20); opacity:.30; }
+.qi-sacred__nebula--two { background:rgba(218,174,113,.16); opacity:.23; }
+.qi-sacred__copy { opacity:.76; }
+.qi-sacred__copy h1 { text-shadow:0 8px 32px rgba(70,50,65,.28); }
+.qi-sacred__record {
+  width:min(378px,26vw);
+  background:linear-gradient(145deg,rgba(255,249,233,.22),rgba(221,194,159,.13));
+  border-color:rgba(255,246,223,.76);
+  -webkit-backdrop-filter:blur(10px) saturate(122%);
+  backdrop-filter:blur(10px) saturate(122%);
+  box-shadow:0 24px 62px rgba(74,50,62,.20),0 0 56px rgba(247,210,148,.18),inset 0 1px 0 rgba(255,255,255,.46);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#fff0cc; text-shadow:0 2px 12px rgba(76,48,48,.30); }
+.qi-sacred__input input {
+  background:rgba(67,48,62,.34);
+  border-color:rgba(255,235,197,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.qi-sacred__input input::placeholder { color:rgba(255,247,227,.68); }
+.qi-sacred__submit {
+  background:linear-gradient(100deg,#f5d59d,#e7a941);
+  color:#2f1b19;
+  box-shadow:0 12px 28px rgba(187,125,44,.28),inset 0 1px 0 rgba(255,255,255,.68);
+}
+@media(min-width:900px) {
+  .qi-sacred__record { transform:translate(-50%,-43%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-44%); }
+}
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { filter:saturate(.72) contrast(.95) brightness(.98) sepia(.08); }
+  .qi-sacred__copy { opacity:.72; }
+  .qi-sacred__record {
+    width:min(88vw,390px);
+    background:linear-gradient(145deg,rgba(255,249,233,.20),rgba(221,194,159,.12));
+    border-color:rgba(255,246,223,.72);
+    box-shadow:0 22px 58px rgba(74,50,62,.18),0 0 46px rgba(247,210,148,.16),inset 0 1px 0 rgba(255,255,255,.42);
+  }
+  .qi-sacred__input input { background:rgba(67,48,62,.32); }
+}
+
+/* V12 final atmosphere: crisp warm astral architecture, without fog or washed-out whites. */
+.qi-sacred__cinematic-scene--desktop {
+  filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06);
+}
+.qi-sacred__nebula,
+.qi-sacred__light-column,
+.qi-sacred__dust { display:none; }
+.qi-sacred::before {
+  background:
+    linear-gradient(90deg,rgba(39,29,38,.26),rgba(82,60,66,.07) 34%,rgba(82,60,66,.04) 68%,rgba(39,29,38,.20)),
+    linear-gradient(180deg,rgba(40,28,38,.16),transparent 34%,rgba(31,23,32,.26));
+}
+.qi-sacred__nav {
+  background:linear-gradient(90deg,rgba(42,29,33,.60),rgba(59,40,41,.42),rgba(42,29,33,.60));
+  border-bottom-color:rgba(225,177,102,.28);
+  -webkit-backdrop-filter:blur(9px) saturate(112%);
+  backdrop-filter:blur(9px) saturate(112%);
+}
+.qi-sacred__copy { opacity:1; }
+.qi-sacred__copy h1 { color:#fff5e6; text-shadow:0 8px 30px rgba(34,23,34,.50); }
+.qi-sacred__intro { color:#f4e7d6; text-shadow:0 2px 12px rgba(34,23,34,.45); }
+.qi-sacred__benefits { color:#f7ead8; border-top-color:rgba(227,180,108,.38); }
+.qi-sacred__record {
+  background:linear-gradient(145deg,rgba(74,55,48,.30),rgba(45,34,40,.26));
+  border-color:rgba(248,224,181,.68);
+  -webkit-backdrop-filter:blur(8px) saturate(118%);
+  backdrop-filter:blur(8px) saturate(118%);
+  box-shadow:0 24px 62px rgba(31,21,28,.30),0 0 42px rgba(207,152,77,.13),inset 0 1px 0 rgba(255,255,255,.30);
+}
+.qi-sacred__input input {
+  background:rgba(48,35,42,.38);
+  border-color:rgba(246,217,171,.50);
+}
+.qi-sacred__record h2,.qi-sacred__record-cap { color:#ffe9bf; }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { filter:saturate(.74) contrast(1.06) brightness(.84) sepia(.06); }
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(74,55,48,.29),rgba(45,34,40,.25)); }
+}
+
+/* V14 composition-only correction: keep the guardian's full face above the form. */
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-face-clear 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 92px),0) scale(1.01);
+  }
+  .qi-sacred__record { transform:translate(-50%,-38%); }
+  .qi-sacred__record:hover { transform:translate(-50%,-39%); }
+}
+@keyframes qi-guardian-face-clear { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 102px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 74px),0) scale(1.02); }
+}
+
+/* V15 luminous guardian: preserve facial warmth and sacred detail through the glass. */
+.qi-sacred__cinematic-scene--desktop { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); }
+@media(max-width:899px) { .qi-sacred__cinematic-scene--mobile { filter:saturate(.84) contrast(1.01) brightness(.91) sepia(.03); } }
+
+/* V16: reveal the guardian instead of tinting her behind an opaque card. */
+.qi-sacred__record {
+  background:linear-gradient(145deg,rgba(255,248,230,.12),rgba(104,82,92,.08));
+  border-color:rgba(255,242,215,.72);
+  -webkit-backdrop-filter:blur(3px) saturate(112%);
+  backdrop-filter:blur(3px) saturate(112%);
+  box-shadow:0 20px 54px rgba(53,34,48,.14),inset 0 1px 0 rgba(255,255,255,.34);
+}
+.qi-sacred__input input { background:rgba(56,40,49,.23); border-color:rgba(255,232,190,.48); }
+@media(min-width:900px) {
+  .qi-sacred__cinematic-scene--desktop {
+    animation:qi-guardian-face-reveal 10s ease-in-out infinite alternate;
+    transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 185px),0) scale(1.01);
+  }
+}
+@keyframes qi-guardian-face-reveal { to { transform:translate3d(var(--qi-oracle-x,0),calc(var(--qi-oracle-y,0) - 195px),0) scale(1.025); } }
+@media(prefers-reduced-motion:reduce) { .qi-sacred__cinematic-scene--desktop { animation:none; } }
+@media(max-width:899px) {
+  .qi-sacred__record { background:linear-gradient(145deg,rgba(255,248,230,.10),rgba(104,82,92,.07)); }
+  .qi-sacred__input input { background:rgba(56,40,49,.22); }
+  .qi-sacred__cinematic-scene--mobile { transform:translate3d(0,calc(var(--qi-mobile-shift,0) - 120px),0) scale(1.02); }
+}
+
+/* V17 clarity pass: preserve the luminous guardian while removing the washed-out first impression. */
+.qi-sacred__cinematic-scene--desktop { filter:saturate(.88) contrast(1.17) brightness(.76) sepia(.02); }
+.qi-sacred__cosmos::after {
+  content:'';
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(37,25,34,.24),transparent 28%,transparent 72%,rgba(37,25,34,.18)),
+    linear-gradient(180deg,rgba(38,26,35,.10),transparent 27%,rgba(35,23,31,.32) 100%);
+  mix-blend-mode:multiply;
+}
+.qi-sacred__stars { opacity:.29; }
+.qi-sacred__record { box-shadow:0 20px 54px rgba(45,28,38,.18),inset 0 1px 0 rgba(255,255,255,.34); }
+@media(max-width:899px) { .qi-sacred__cinematic-scene--mobile { filter:saturate(.88) contrast(1.17) brightness(.76) sepia(.02); } }

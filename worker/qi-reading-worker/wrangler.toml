@@ -1,0 +1,11 @@
+name = "qi-reading-worker"
+main = "src/index.js"
+compatibility_date = "2026-07-31"
+
+# Set provider secrets with `wrangler secret put`, never in this file:
+# ROXY_API_KEY
+# DEEPSEEK_API_KEY
+#
+# Set these non-secret variables in the Cloudflare dashboard or with `wrangler secret put`:
+# ALLOWED_ORIGIN (https://qivessel.com)
+# DEEPSEEK_MODEL (optional; defaults to deepseek-chat)

@@ -1,13 +1,24 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {{ 'qi-sacred-hero.css' | asset_url | stylesheet_tag }}
+{{ 'qi-sacred-hero-final.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'qi-sacred-hero.js' | asset_url }}" defer></script>
 
 <section
   id="QiSacredHero-{{ section.id }}"
   class="qi-sacred"
   data-qi-sacred
-  data-api-endpoint="{{ section.settings.api_endpoint | escape }}"
+  {%- assign api_endpoint = section.settings.api_endpoint | default: '/apps/reading' | strip -%}
+  {%- if api_endpoint contains '://' -%}
+    {%- assign api_endpoint = '/apps/reading' -%}
+  {%- endif -%}
+  data-api-endpoint="{{ api_endpoint | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
+    <picture>
+      <source media="(max-width: 899px)" srcset="{{ 'qi-sacred-hero-guardian-mobile-v19.png' | asset_url }}" width="936" height="1664">
+      <img class="qi-sacred__cinematic-scene qi-sacred__cinematic-scene--desktop" src="{{ 'qi-sacred-hero-guardian-v19.png' | asset_url }}" alt="" width="1664" height="936" loading="eager" fetchpriority="high" decoding="async">
+    </picture>
     <span class="qi-sacred__nebula qi-sacred__nebula--one"></span>
     <span class="qi-sacred__nebula qi-sacred__nebula--two"></span>
     <span class="qi-sacred__stars qi-sacred__stars--far"></span>
@@ -70,7 +81,7 @@
 
     <div class="qi-sacred__oracle" aria-label="Sacred astrology guide">
       <div class="qi-sacred__beam" aria-hidden="true"></div>
-      <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-oracle-final.webp' | asset_url }}" alt="Celestial oracle in a sacred astrology ritual" width="670" height="770" loading="eager" fetchpriority="high">
+      <img class="qi-sacred__priestess qi-sacred__priestess--reconstruction" src="{{ 'qi-oracle-final.webp' | asset_url }}" alt="Celestial oracle in a sacred astrology ritual" width="670" height="770" loading="lazy" decoding="async">
       <span class="qi-sacred__oracle-vignette" aria-hidden="true"></span>
     </div>
 
@@ -123,8 +134,44 @@
 
   <dialog class="qi-sacred__ritual" data-ritual-dialog>
     <button class="qi-sacred__ritual-close" type="button" aria-label="Close" data-close-ritual>×</button>
-    <div class="qi-sacred__ritual-wheel" aria-hidden="true">✦</div>
-    <p data-ritual-stage>ALIGNING YOUR CELESTIAL PATTERNS…</p>
+    <div class="qi-sacred__ritual-loading" data-ritual-loading>
+      <div class="qi-sacred__ritual-wheel" aria-hidden="true">✦</div>
+      <p data-ritual-stage>ALIGNING YOUR CELESTIAL PATTERNS…</p>
+    </div>
+    <article class="qi-sacred__reading-result" data-reading-result hidden>
+      <p class="qi-sacred__reading-kicker">YOUR CELESTIAL READING</p>
+      <p class="qi-sacred__reading-archetype" data-reading-archetype></p>
+      <h2 data-reading-title>Your Astral Profile</h2>
+      <p class="qi-sacred__reading-location" data-reading-location></p>
+      <p class="qi-sacred__reading-opening" data-reading-opening></p>
+      <section class="qi-sacred__big-three" aria-label="Your Big Three" data-reading-big-three></section>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--tension">
+        <p class="qi-sacred__reading-section-label">YOUR CURRENT TENSION</p>
+        <h3 data-reading-tension-title>Where Your Energy Leaks</h3>
+        <p data-reading-tension-body></p>
+      </section>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--cost" data-reading-cost-section hidden>
+        <p class="qi-sacred__reading-section-label">WHAT THIS MAY COST YOU</p>
+        <ul class="qi-sacred__cost-list" data-reading-cost-list></ul>
+      </section>
+      <section class="qi-sacred__reading-section qi-sacred__reading-section--ritual">
+        <p class="qi-sacred__reading-section-label">YOUR RITUAL INTENTION</p>
+        <h3 data-reading-ritual-intention></h3>
+        <p data-reading-ritual-practice></p>
+      </section>
+      <section class="qi-sacred__bracelet-card">
+        <p class="qi-sacred__reading-section-label">YOUR ALIGNED BRACELET</p>
+        <h3 data-reading-bracelet-title></h3>
+        <div class="qi-sacred__crystal-chips" data-reading-crystals></div>
+        <p data-reading-bracelet-reason></p>
+        <div class="qi-sacred__bracelet-ritual" data-reading-bracelet-ritual-wrap hidden>
+          <span>WEAR IT AS A CUE</span>
+          <p data-reading-bracelet-ritual></p>
+        </div>
+        <a class="qi-sacred__reading-cta" href="{{ routes.collections_url }}" data-reading-cta>EXPLORE YOUR ALIGNED BRACELETS <span>＋</span></a>
+      </section>
+      <p class="qi-sacred__reading-note" data-reading-note>For reflection and personal inspiration. Your path is always your own.</p>
+    </article>
   </dialog>
 </section>
 
@@ -136,7 +183,7 @@
   "settings": [
     {"type":"image_picker","id":"priestess","label":"Priestess image"},
     {"type":"link_list","id":"menu","label":"Navigation menu"},
-    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","info":"Optional. Leave blank until your secure server endpoint is ready."},
+    {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","default":"/apps/reading","info":"Keep as /apps/reading so requests stay on your store domain (works on mobile and desktop)."},
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
     {"type":"inline_richtext","id":"heading","label":"Heading","default":"Reveal The Story Written In Your Stars"},
     {"type":"richtext","id":"text","label":"Introduction","default":"<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>"},
