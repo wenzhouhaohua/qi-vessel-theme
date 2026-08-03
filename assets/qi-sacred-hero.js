@@ -214,6 +214,175 @@
       }
     };
 
+    // ---- Birthplace city picker ----
+    // Lets visitors search RoxyAPI's canonical city list and lock the exact
+    // coordinates/timezone for the chosen city, so the reading no longer
+    // depends on fuzzy free-text matching (e.g. "New York" -> Albany).
+    const placeField = root.querySelector('[data-place-field]');
+    const placeInput = root.querySelector('[data-place-input]');
+    const placeList = root.querySelector('[data-place-list]');
+    const placeNote = root.querySelector('[data-place-note]');
+    const placeLat = root.querySelector('[data-place-lat]');
+    const placeLng = root.querySelector('[data-place-lng]');
+    const placeTz = root.querySelector('[data-place-tz]');
+    const locationsEndpoint = root.dataset.locationsEndpoint?.trim() || '';
+
+    let placeOptions = [];
+    let placeActiveIndex = -1;
+    let placeRequestId = 0;
+    let placeTimer = null;
+    let placeAbort = null;
+
+    const closePlaceList = () => {
+      placeOptions = [];
+      placeActiveIndex = -1;
+      if (placeList) placeList.hidden = true;
+      placeInput?.setAttribute('aria-expanded', 'false');
+      placeInput?.removeAttribute('aria-activedescendant');
+    };
+
+    const clearPlaceSelection = () => {
+      if (placeLat) placeLat.value = '';
+      if (placeLng) placeLng.value = '';
+      if (placeTz) placeTz.value = '';
+      if (placeNote) {
+        placeNote.hidden = true;
+        placeNote.classList.remove('is-ok');
+        placeNote.textContent = '';
+      }
+    };
+
+    const selectPlace = (item) => {
+      if (!item) return;
+      if (placeInput) placeInput.value = item.label;
+      if (placeLat) placeLat.value = item.lat ?? '';
+      if (placeLng) placeLng.value = item.lng ?? '';
+      if (placeTz) placeTz.value = item.tz ?? '';
+      closePlaceList();
+      if (placeNote) {
+        placeNote.textContent = `Selected: ${item.label}`;
+        placeNote.classList.add('is-ok');
+        placeNote.hidden = false;
+      }
+    };
+
+    const renderPlaceOptions = (items) => {
+      if (!placeList) return;
+      placeOptions = items || [];
+      placeActiveIndex = -1;
+      placeList.replaceChildren();
+      if (!placeOptions.length) {
+        const empty = document.createElement('div');
+        empty.className = 'qi-sacred__place-empty';
+        empty.textContent = 'No exact match found — you can still continue typing your city.';
+        placeList.append(empty);
+      } else {
+        placeOptions.forEach((item, index) => {
+          const option = document.createElement('button');
+          option.type = 'button';
+          option.className = 'qi-sacred__place-option';
+          option.setAttribute('role', 'option');
+          option.id = `${placeList.id}-option-${index}`;
+          option.textContent = item.label;
+          option.addEventListener('mousedown', (event) => event.preventDefault());
+          option.addEventListener('click', () => selectPlace(item));
+          placeList.append(option);
+        });
+      }
+      placeList.hidden = false;
+      placeInput?.setAttribute('aria-expanded', 'true');
+    };
+
+    const movePlaceActive = (delta) => {
+      if (!placeOptions.length || !placeList || placeList.hidden) return;
+      placeActiveIndex = (placeActiveIndex + delta + placeOptions.length) % placeOptions.length;
+      const options = placeList.querySelectorAll('[role="option"]');
+      options.forEach((option, index) => {
+        option.classList.toggle('is-active', index === placeActiveIndex);
+        if (index === placeActiveIndex) option.setAttribute('aria-selected', 'true');
+        else option.removeAttribute('aria-selected');
+      });
+      if (options[placeActiveIndex]) {
+        placeInput?.setAttribute('aria-activedescendant', options[placeActiveIndex].id);
+        options[placeActiveIndex].scrollIntoView({ block: 'nearest' });
+      }
+    };
+
+    const searchPlaces = async (query) => {
+      if (!locationsEndpoint || !placeInput || !placeList) return;
+      const requestId = ++placeRequestId;
+      placeAbort?.abort();
+      const controller = new AbortController();
+      placeAbort = controller;
+      try {
+        const url = new URL(locationsEndpoint, window.location.href);
+        url.searchParams.set('q', query);
+        url.searchParams.set('limit', '8');
+        const response = await fetch(url.toString(), {
+          headers: { Accept: 'application/json' },
+          signal: controller.signal
+        });
+        if (requestId !== placeRequestId) return;
+        if (!response.ok) throw new Error(`City search failed (${response.status})`);
+        const data = await response.json();
+        if (requestId !== placeRequestId) return;
+        const items = (data.cities || []).map((city) => ({
+          label: city.label || `${city.city || ''}${city.country ? `, ${city.country}` : ''}`,
+          lat: Number(city.latitude),
+          lng: Number(city.longitude),
+          tz: city.timezone || ''
+        })).filter((city) => city.label);
+        renderPlaceOptions(items);
+      } catch (error) {
+        if (error?.name === 'AbortError' || requestId !== placeRequestId) return;
+        closePlaceList();
+        if (placeNote) {
+          placeNote.textContent = 'City search is unavailable — you can enter your city manually.';
+          placeNote.hidden = false;
+        }
+      }
+    };
+
+    if (placeInput && placeList) {
+      placeInput.addEventListener('input', () => {
+        clearPlaceSelection();
+        closePlaceList();
+        const query = placeInput.value.trim();
+        if (query.length < 2) return;
+        window.clearTimeout(placeTimer);
+        placeTimer = window.setTimeout(() => searchPlaces(query), 260);
+      });
+
+      placeInput.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          movePlaceActive(1);
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          movePlaceActive(-1);
+        } else if (event.key === 'Enter') {
+          if (!placeList.hidden && placeOptions[placeActiveIndex]) {
+            event.preventDefault();
+            selectPlace(placeOptions[placeActiveIndex]);
+          }
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          closePlaceList();
+        } else if (event.key === 'Tab') {
+          closePlaceList();
+        }
+      });
+
+      placeInput.addEventListener('blur', () => {
+        window.clearTimeout(placeTimer);
+        window.setTimeout(closePlaceList, 120);
+      });
+    }
+
+    document.addEventListener('pointerdown', (event) => {
+      if (placeField && !placeField.contains(event.target)) closePlaceList();
+    }, { passive: true });
+
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (status) status.textContent = '';

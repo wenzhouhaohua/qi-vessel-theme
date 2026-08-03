@@ -13,6 +13,8 @@
     {% assign api_endpoint = '/apps/reading' %}
   {% endif %}
   data-api-endpoint="{{ api_endpoint | escape }}"
+  {% assign locations_endpoint = section.settings.locations_endpoint | default: 'https://qi-reading-worker.wenzhouhaohua.workers.dev/locations' | strip %}
+  data-locations-endpoint="{{ locations_endpoint | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
     <picture>
@@ -104,10 +106,20 @@
           <span><b>03</b> TIME OF BIRTH</span>
           <span class="qi-sacred__input"><input name="birth_time" type="time" autocomplete="off" required><i>◷</i></span>
         </label>
-        <label class="qi-sacred__field">
-          <span><b>04</b> PLACE OF BIRTH</span>
-          <span class="qi-sacred__input"><input name="birth_place" type="text" autocomplete="address-level2" enterkeyhint="next" placeholder="City, State / Province, Country" required><i>⌖</i></span>
-        </label>
+        <div class="qi-sacred__field qi-sacred__field--place" data-place-field>
+          <label class="qi-sacred__place-label" for="QiPlaceInput-{{ section.id }}">
+            <span><b>04</b> PLACE OF BIRTH</span>
+          </label>
+          <span class="qi-sacred__input">
+            <input id="QiPlaceInput-{{ section.id }}" name="birth_place" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="QiPlaces-{{ section.id }}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" placeholder="Start typing a city, e.g. New York" required data-place-input>
+            <input type="hidden" name="birth_latitude" data-place-lat>
+            <input type="hidden" name="birth_longitude" data-place-lng>
+            <input type="hidden" name="birth_timezone" data-place-tz>
+            <i>⌖</i>
+          </span>
+          <div class="qi-sacred__place-list" id="QiPlaces-{{ section.id }}" role="listbox" aria-label="Matching cities" hidden data-place-list></div>
+          <p class="qi-sacred__place-note" data-place-note hidden></p>
+        </div>
         <label class="qi-sacred__field">
           <span><b>05</b> EMAIL ADDRESS</span>
           <span class="qi-sacred__input"><input name="email" type="email" inputmode="email" autocomplete="email" enterkeyhint="done" placeholder="you@example.com" required><i>✉</i></span>
@@ -184,6 +196,7 @@
     {"type":"image_picker","id":"priestess","label":"Priestess image"},
     {"type":"link_list","id":"menu","label":"Navigation menu"},
     {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","default":"/apps/reading","info":"Keep as /apps/reading so requests stay on your store domain (works on mobile and desktop)."},
+    {"type":"text","id":"locations_endpoint","label":"City search API endpoint","default":"https://qi-reading-worker.wenzhouhaohua.workers.dev/locations","info":"Feeds the birthplace city picker. Keep the Worker URL; if you later add an App Proxy path for search, you can switch this to /apps/locations."},
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
     {"type":"inline_richtext","id":"heading","label":"Heading","default":"Reveal The Story Written In Your Stars"},
     {"type":"richtext","id":"text","label":"Introduction","default":"<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>"},

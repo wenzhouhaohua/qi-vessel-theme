@@ -139,7 +139,7 @@ const corsHeaders = (request, env) => {
   if (!origin || !allowed.includes(origin)) return null;
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin'
@@ -210,6 +210,16 @@ const isValidDate = (value) => {
 
 const isValidTime = (value) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
+const isValidTimezone = (value) => {
+  if (typeof value !== 'string' || !value || value.length > 64) return false;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const validReading = (payload) => {
   const reading = {
     name: cleanText(payload?.name, 80),
@@ -226,6 +236,24 @@ const validReading = (payload) => {
     !reading.birth_place ||
     !emailIsValid
   ) return null;
+  // Optional: the front-end city picker resolves a canonical location and
+  // sends its exact coordinates/timezone so we skip fuzzy re-matching. All
+  // three fields must be present and valid together, otherwise we fall back
+  // to the regular birthplace lookup.
+  const birthLatitude = Number(payload?.birth_latitude);
+  const birthLongitude = Number(payload?.birth_longitude);
+  const birthTimezone = cleanText(payload?.birth_timezone, 64);
+  if (
+    Number.isFinite(birthLatitude) &&
+    birthLatitude >= -90 && birthLatitude <= 90 &&
+    Number.isFinite(birthLongitude) &&
+    birthLongitude >= -180 && birthLongitude <= 180 &&
+    isValidTimezone(birthTimezone)
+  ) {
+    reading.birth_latitude = birthLatitude;
+    reading.birth_longitude = birthLongitude;
+    reading.birth_timezone = birthTimezone;
+  }
   return reading;
 };
 
@@ -233,8 +261,22 @@ const validReading = (payload) => {
 // upstream location API (saves latency and quota). Not durable across
 // isolates, which is fine: it is only a performance optimization.
 const locationCache = new Map();
+const searchCache = new Map();
 
-const getBirthLocation = async (birthPlace, env) => {
+const getBirthLocation = async (reading, env) => {
+  // When the visitor picked a city from the picker, its coordinates are
+  // already canonical (from the same RoxyAPI dataset), so use them directly.
+  if (reading.birth_latitude !== undefined) {
+    return {
+      city: reading.birth_place,
+      country: '',
+      latitude: reading.birth_latitude,
+      longitude: reading.birth_longitude,
+      timezone: reading.birth_timezone
+    };
+  }
+
+  const birthPlace = reading.birth_place;
   let apiKey = String(env.ROXY_API_KEY || '').trim();
   if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
     apiKey = apiKey.slice(1, -1).trim();
@@ -268,6 +310,57 @@ const getBirthLocation = async (birthPlace, env) => {
   const value = { ...place, latitude, longitude };
   if (locationCache.size >= LOCATION_CACHE_MAX_ENTRIES) locationCache.clear();
   locationCache.set(cacheKey, { value, expiresAt: Date.now() + LOCATION_CACHE_TTL_MS });
+  return value;
+};
+
+const locationLabel = (place) => [place?.city, place?.province, place?.country]
+  .map((part) => typeof part === 'string' ? part.trim() : '')
+  .filter(Boolean)
+  .join(', ');
+
+// City picker endpoint: proxies RoxyAPI's location search with a slim,
+// front-end friendly response shape. Results are cached per query.
+const searchLocations = async (query, limit, env) => {
+  let apiKey = String(env.ROXY_API_KEY || '').trim();
+  if ((apiKey.startsWith('"') && apiKey.endsWith('"')) || (apiKey.startsWith("'") && apiKey.endsWith("'"))) {
+    apiKey = apiKey.slice(1, -1).trim();
+  }
+  if (!apiKey) throw new Error('RoxyAPI is not configured.');
+
+  const cacheKey = `${query.trim().toLowerCase()}|${limit}`;
+  const cached = searchCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+  const url = new URL(`${ROXY_API_BASE}/location/search`);
+  url.searchParams.set('q', query);
+  url.searchParams.set('limit', String(limit));
+
+  const data = await fetchJsonWithRetry(
+    url,
+    {
+      headers: { 'X-API-Key': apiKey }
+    },
+    {
+      timeoutMs: 5000,
+      attempts: 1,
+      label: 'Location search'
+    }
+  );
+  const cities = Array.isArray(data?.cities)
+    ? data.cities.slice(0, limit).map((place) => ({
+        label: locationLabel(place) || place?.city || query,
+        city: place?.city || '',
+        province: place?.province || '',
+        country: place?.country || '',
+        iso2: place?.iso2 || '',
+        latitude: Number(place?.latitude),
+        longitude: Number(place?.longitude),
+        timezone: place?.timezone || ''
+      }))
+    : [];
+  const value = { cities };
+  if (searchCache.size >= LOCATION_CACHE_MAX_ENTRIES) searchCache.clear();
+  searchCache.set(cacheKey, { value, expiresAt: Date.now() + LOCATION_CACHE_TTL_MS });
   return value;
 };
 
@@ -369,9 +462,26 @@ export default {
     // configured proxy URL), so normalize trailing slashes away.
     const pathname = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
     const readingPaths = ['/reading', '/apps/reading', '/'];
+    const locationPaths = ['/locations', '/apps/locations'];
 
     if (request.method === 'GET' && readingPaths.includes(pathname)) {
       return json({ status: 'Qi Reading Proxy is ready.' }, 200, headers);
+    }
+    if (request.method === 'GET' && locationPaths.includes(pathname)) {
+      try {
+        const url = new URL(request.url);
+        const query = cleanText(url.searchParams.get('q'), 100);
+        if (!query) return json({ error: 'Missing search query.' }, 400, headers);
+        const requestedLimit = Number(url.searchParams.get('limit'));
+        const limit = Number.isFinite(requestedLimit)
+          ? Math.min(8, Math.max(1, Math.trunc(requestedLimit)))
+          : 8;
+        const result = await searchLocations(query, limit, env);
+        return json(result, 200, headers);
+      } catch (error) {
+        console.error(`Location search failed: ${errorMessage(error)}`);
+        return json({ error: 'City search is temporarily unavailable.' }, 502, headers);
+      }
     }
     if (request.method !== 'POST' || !readingPaths.includes(pathname)) {
       console.warn(`Qi reading: rejected path "${pathname}".`);
@@ -404,7 +514,7 @@ export default {
       if (!reading) return json({ error: 'Please provide valid birth details and email.' }, 400, headers);
 
       console.info('Reading: resolving birthplace.');
-      const location = await getBirthLocation(reading.birth_place, env);
+      const location = await getBirthLocation(reading, env);
       console.info('Reading: calculating natal chart.');
       const natalChart = await requestNatalChart(reading, location, env);
       console.info('Reading: generating interpretation.');

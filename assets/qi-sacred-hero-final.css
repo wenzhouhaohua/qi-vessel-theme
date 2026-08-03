@@ -95,3 +95,68 @@
   .qi-sacred__form { grid-template-columns:1fr; gap:8px; }
   .qi-sacred__field,.qi-sacred__field:nth-of-type(1),.qi-sacred__field:nth-of-type(4),.qi-sacred__field:nth-of-type(5),.qi-sacred__submit,.qi-sacred__trust,.qi-sacred__privacy,.qi-sacred__status { grid-column:auto; }
 }
+
+/* Birthplace city picker */
+.qi-sacred__field--place { position:relative; }
+.qi-sacred__field--place { grid-column:1 / -1; }
+.qi-sacred__place-label { cursor:pointer; }
+.qi-sacred__place-label > span { font-size:7.2px; font-weight:600; color:#f1ece8; letter-spacing:.06em; }
+.qi-sacred__place-label b { color:var(--qi-gold,#e3cf8d); margin-right:6px; }
+.qi-sacred__place-list {
+  position:absolute;
+  top:calc(100% + 4px);
+  left:0;
+  right:0;
+  z-index:30;
+  max-height:250px;
+  overflow:auto;
+  margin:0;
+  padding:4px;
+  background:rgba(10,8,20,.97);
+  border:1px solid rgba(229,207,141,.45);
+  border-radius:6px;
+  box-shadow:0 12px 32px rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+}
+.qi-sacred__place-option {
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:9px 11px;
+  background:transparent;
+  border:0;
+  border-radius:4px;
+  color:#f3ecdd;
+  font:400 13px/1.35 Inter,sans-serif;
+  cursor:pointer;
+}
+.qi-sacred__place-option:hover,
+.qi-sacred__place-option.is-active,
+.qi-sacred__place-option[aria-selected="true"] {
+  background:rgba(229,207,141,.16);
+  color:#ffe9b8;
+}
+.qi-sacred__place-option:focus-visible {
+  outline:2px solid rgba(229,207,141,.6);
+  outline-offset:-2px;
+}
+.qi-sacred__place-empty {
+  padding:9px 11px;
+  color:rgba(247,245,241,.66);
+  font-size:12px;
+}
+.qi-sacred__place-note {
+  margin:3px 0 0;
+  font-size:11px;
+  line-height:1.4;
+  color:rgba(247,245,241,.72);
+}
+.qi-sacred__place-note.is-ok { color:#d9f2c7; }
+
+@media (min-width:990px) {
+  .qi-sacred__place-option { font-size:14px; padding:10px 12px; }
+}
+@media (max-width:520px) {
+  .qi-sacred__place-list { max-height:220px; }
+}
