@@ -70,6 +70,8 @@ The theme's birthplace picker searches `GET /locations?q=<query>&limit=<1-8>` (s
 
 `label` is built from the canonical `city`/`province`/`country` fields, so selecting it and submitting avoids fuzzy re-matching. Requests to `/locations` use the same authorization as `/reading` (Shopify App Proxy signature or an allowed `Origin`). The theme's **QI Sacred Hero -> City search API endpoint** setting points at this URL.
 
+For mobile visitors (whose networks often cannot reach `workers.dev` reliably), the theme defaults the picker to the same-origin proxy route `GET /apps/reading?mode=locations&q=<query>` instead. Shopify's App Proxy forwards it to the Worker with the usual `signature`/`shop`/`timestamp` parameters, and the Worker serves the same city-search response when `mode=locations` is present on a reading path. No extra App Proxy subpath is required. A fallback to the direct `/locations` Worker URL is used only if the same-origin call fails.
+
 ## Optional exact-coordinate submission
 
 When a visitor picks a city from the picker, the theme sends three extra fields in the reading POST body:

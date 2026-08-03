@@ -364,6 +364,22 @@ const searchLocations = async (query, limit, env) => {
   return value;
 };
 
+const handleLocationSearch = async (url, headers, env) => {
+  try {
+    const query = cleanText(url.searchParams.get('q'), 100);
+    if (!query) return json({ error: 'Missing search query.' }, 400, headers);
+    const requestedLimit = Number(url.searchParams.get('limit'));
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(8, Math.max(1, Math.trunc(requestedLimit)))
+      : 8;
+    const result = await searchLocations(query, limit, env);
+    return json(result, 200, headers);
+  } catch (error) {
+    console.error(`Location search failed: ${errorMessage(error)}`);
+    return json({ error: 'City search is temporarily unavailable.' }, 502, headers);
+  }
+};
+
 const utcOffsetAtBirth = (date, time, timeZone) => {
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
@@ -465,23 +481,16 @@ export default {
     const locationPaths = ['/locations', '/apps/locations'];
 
     if (request.method === 'GET' && readingPaths.includes(pathname)) {
+      const url = new URL(request.url);
+      // Same-origin city search through the reading App Proxy, so mobile
+      // visitors never have to reach workers.dev directly.
+      if (url.searchParams.get('mode') === 'locations') {
+        return handleLocationSearch(url, headers, env);
+      }
       return json({ status: 'Qi Reading Proxy is ready.' }, 200, headers);
     }
     if (request.method === 'GET' && locationPaths.includes(pathname)) {
-      try {
-        const url = new URL(request.url);
-        const query = cleanText(url.searchParams.get('q'), 100);
-        if (!query) return json({ error: 'Missing search query.' }, 400, headers);
-        const requestedLimit = Number(url.searchParams.get('limit'));
-        const limit = Number.isFinite(requestedLimit)
-          ? Math.min(8, Math.max(1, Math.trunc(requestedLimit)))
-          : 8;
-        const result = await searchLocations(query, limit, env);
-        return json(result, 200, headers);
-      } catch (error) {
-        console.error(`Location search failed: ${errorMessage(error)}`);
-        return json({ error: 'City search is temporarily unavailable.' }, 502, headers);
-      }
+      return handleLocationSearch(new URL(request.url), headers, env);
     }
     if (request.method !== 'POST' || !readingPaths.includes(pathname)) {
       console.warn(`Qi reading: rejected path "${pathname}".`);

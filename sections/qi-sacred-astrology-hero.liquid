@@ -13,8 +13,10 @@
     {% assign api_endpoint = '/apps/reading' %}
   {% endif %}
   data-api-endpoint="{{ api_endpoint | escape }}"
-  {% assign locations_endpoint = section.settings.locations_endpoint | default: 'https://qi-reading-worker.wenzhouhaohua.workers.dev/locations' | strip %}
+  {% assign locations_endpoint = section.settings.locations_endpoint | default: '/apps/reading?mode=locations' | strip %}
   data-locations-endpoint="{{ locations_endpoint | escape }}"
+  {% assign locations_fallback = section.settings.locations_fallback_endpoint | default: 'https://qi-reading-worker.wenzhouhaohua.workers.dev/locations' | strip %}
+  data-locations-fallback="{{ locations_fallback | escape }}"
 >
   <div class="qi-sacred__cosmos" aria-hidden="true">
     <picture>
@@ -196,7 +198,8 @@
     {"type":"image_picker","id":"priestess","label":"Priestess image"},
     {"type":"link_list","id":"menu","label":"Navigation menu"},
     {"type":"text","id":"api_endpoint","label":"Secure reading API endpoint","default":"/apps/reading","info":"Keep as /apps/reading so requests stay on your store domain (works on mobile and desktop)."},
-    {"type":"text","id":"locations_endpoint","label":"City search API endpoint","default":"https://qi-reading-worker.wenzhouhaohua.workers.dev/locations","info":"Feeds the birthplace city picker. Keep the Worker URL; if you later add an App Proxy path for search, you can switch this to /apps/locations."},
+    {"type":"text","id":"locations_endpoint","label":"City search API endpoint","default":"/apps/reading?mode=locations","info":"Feeds the birthplace city picker. Keep this same-origin path so mobile visitors never need to reach workers.dev directly."},
+    {"type":"text","id":"locations_fallback_endpoint","label":"City search fallback endpoint","default":"https://qi-reading-worker.wenzhouhaohua.workers.dev/locations","info":"Used only if the same-origin endpoint above fails. Keep the Worker URL."},
     {"type":"text","id":"eyebrow","label":"Eyebrow","default":"A PERSONAL ASTROLOGICAL JOURNEY"},
     {"type":"inline_richtext","id":"heading","label":"Heading","default":"Reveal The Story Written In Your Stars"},
     {"type":"richtext","id":"text","label":"Introduction","default":"<p>Your birth chart holds the keys to your personality, purpose and inner energy. Discover your personalized crystal connection and guidance.</p>"},

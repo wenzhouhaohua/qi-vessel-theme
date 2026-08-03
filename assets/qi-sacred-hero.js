@@ -226,6 +226,7 @@
     const placeLng = root.querySelector('[data-place-lng]');
     const placeTz = root.querySelector('[data-place-tz]');
     const locationsEndpoint = root.dataset.locationsEndpoint?.trim() || '';
+    const locationsFallback = root.dataset.locationsFallback?.trim() || '';
 
     let placeOptions = [];
     let placeActiveIndex = -1;
@@ -308,24 +309,40 @@
       }
     };
 
+    const fetchLocations = async (endpoint, query, signal) => {
+      const url = new URL(endpoint, window.location.href);
+      url.searchParams.set('q', query);
+      url.searchParams.set('limit', '8');
+      const response = await fetch(url.toString(), {
+        headers: { Accept: 'application/json' },
+        signal
+      });
+      if (!response.ok) throw new Error(`City search failed (${response.status})`);
+      return response.json();
+    };
+
     const searchPlaces = async (query) => {
-      if (!locationsEndpoint || !placeInput || !placeList) return;
+      if ((!locationsEndpoint && !locationsFallback) || !placeInput || !placeList) return;
       const requestId = ++placeRequestId;
       placeAbort?.abort();
       const controller = new AbortController();
       placeAbort = controller;
+      const endpoints = [locationsEndpoint, locationsFallback]
+        .filter((value, index, all) => value && all.indexOf(value) === index);
       try {
-        const url = new URL(locationsEndpoint, window.location.href);
-        url.searchParams.set('q', query);
-        url.searchParams.set('limit', '8');
-        const response = await fetch(url.toString(), {
-          headers: { Accept: 'application/json' },
-          signal: controller.signal
-        });
+        let data = null;
+        let lastError = null;
+        for (const endpoint of endpoints) {
+          try {
+            data = await fetchLocations(endpoint, query, controller.signal);
+            break;
+          } catch (error) {
+            if (error?.name === 'AbortError') return;
+            lastError = error;
+          }
+        }
         if (requestId !== placeRequestId) return;
-        if (!response.ok) throw new Error(`City search failed (${response.status})`);
-        const data = await response.json();
-        if (requestId !== placeRequestId) return;
+        if (!data) throw lastError || new Error('City search failed');
         const items = (data.cities || []).map((city) => ({
           label: city.label || `${city.city || ''}${city.country ? `, ${city.country}` : ''}`,
           lat: Number(city.latitude),
@@ -373,9 +390,14 @@
         }
       });
 
-      placeInput.addEventListener('blur', () => {
+      placeInput.addEventListener('blur', (event) => {
         window.clearTimeout(placeTimer);
-        window.setTimeout(closePlaceList, 120);
+        if (placeList.contains(event.relatedTarget)) return;
+        window.setTimeout(() => {
+          if (document.activeElement !== placeInput && !placeField?.contains(document.activeElement)) {
+            closePlaceList();
+          }
+        }, 150);
       });
     }
 
